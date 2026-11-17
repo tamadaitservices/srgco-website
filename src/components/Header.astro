@@ -1,0 +1,74 @@
+---
+import { firm, nav } from '../data/site';
+const path = Astro.url.pathname;
+---
+<header class="site-header sticky top-0 z-30 border-b-[3px] border-double border-ink bg-paper/90 backdrop-blur-md">
+  <div class="mx-auto flex max-w-[88rem] items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4">
+    <a href="/" class="leading-none" aria-label={`${firm.name} — home`}>
+      <span class="brand block whitespace-nowrap font-serif text-lg font-semibold tracking-tight text-pen sm:text-2xl md:text-[1.7rem]">S.R. Garimella <span class="amp">&amp;</span> Co.</span>
+      <span class="label mt-1 hidden sm:block">Chartered Accountants · Est. {firm.established}</span><span class="label mt-0.5 block !text-[0.58rem] sm:hidden">Chartered Accountants</span>
+    </a>
+
+    <nav class="hidden items-center gap-7 md:flex" aria-label="Main">
+      {nav.map((n) => (
+        <a
+          href={n.href}
+          class:list={['label nav-link !text-[0.72rem] hover:text-pen', path.startsWith(n.href) && '!text-pen underline decoration-stamp decoration-2 underline-offset-8']}
+          aria-current={path.startsWith(n.href) ? 'page' : undefined}
+        >{n.label}</a>
+      ))}
+    </nav>
+
+    <div class="flex items-center gap-2 sm:gap-3">
+    <a href="/contact" class="nv-pill">Schedule a consultation <span aria-hidden="true">→</span></a>
+    <div class="theme-switch" role="radiogroup" aria-label="Colour theme" id="theme-switch">
+      <button type="button" role="radio" aria-checked="false" data-theme-choice="navy" title="Navy &amp; copper"><span class="dot d-navy"></span><span class="hidden xl:inline">Navy</span></button>
+      <button type="button" role="radio" aria-checked="false" data-theme-choice="light" title="Ledger (light)"><span class="dot d-light"></span><span class="hidden xl:inline">Ledger</span></button>
+      <button type="button" role="radio" aria-checked="false" data-theme-choice="dark" title="Night (dark)"><span class="dot d-dark"></span><span class="hidden xl:inline">Night</span></button>
+      <button type="button" role="radio" aria-checked="false" data-theme-choice="emerald" title="Emerald &amp; gold"><span class="dot d-emerald"></span><span class="hidden xl:inline">Emerald</span></button>
+    </div>
+    <details class="relative md:hidden">
+      <summary class="label cursor-pointer list-none whitespace-nowrap !text-pen" aria-label="Menu"><span class="text-xl leading-none sm:hidden" aria-hidden="true">☰</span><span class="hidden sm:inline">Menu ☰</span></summary>
+      <nav class="absolute right-0 mt-3 w-56 border border-ink bg-paper p-4" aria-label="Mobile">
+        {nav.map((n) => <a href={n.href} class="label block py-2 !text-pen">{n.label}</a>)}
+      </nav>
+    </details>
+    </div>
+  </div>
+</header>
+
+<script>
+  const root = document.documentElement;
+  const group = document.getElementById('theme-switch');
+  const buttons = Array.from(group?.querySelectorAll<HTMLButtonElement>('button') ?? []);
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sync = () => buttons.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.themeChoice === root.dataset.theme)));
+  sync();
+
+  function setTheme(next: string, origin: HTMLElement) {
+    if (next === root.dataset.theme) return;
+    const apply = () => { root.dataset.theme = next; sync(); };
+    try { localStorage.setItem('srg-theme', next); } catch {}
+    const vt = (document as any).startViewTransition;
+    if (!vt || reduced) { apply(); return; }
+    const r = origin.getBoundingClientRect();
+    const x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    root.classList.add('theme-vt');
+    const t = (document as any).startViewTransition(apply);
+    t.ready.then(() => {
+      root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        { duration: 700, easing: 'cubic-bezier(.65,0,.25,1)', pseudoElement: '::view-transition-new(root)' },
+      );
+    });
+    t.finished.finally(() => root.classList.remove('theme-vt'));
+  }
+  buttons.forEach((b) => b.addEventListener('click', () => setTheme(b.dataset.themeChoice!, b)));
+  group?.addEventListener('keydown', (e) => {
+    if (!['ArrowRight', 'ArrowLeft'].includes(e.key)) return;
+    const i = buttons.findIndex((b) => b.dataset.themeChoice === root.dataset.theme);
+    const n = buttons[(i + (e.key === 'ArrowRight' ? 1 : buttons.length - 1)) % buttons.length];
+    n.focus(); setTheme(n.dataset.themeChoice!, n);
+  });
+</script>

@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import { sectors } from '../data/site';
+---
+<Base title="Sectors We Serve" description="Sectorial experience in pharma, agri-chem, herbal and aqua, IT/ITES, R&D, healthcare and hospitals, education and construction.">
+  <section class="mx-auto max-w-4xl px-5 pt-14">
+    <p class="label">Sectorial experience</p>
+    <h1 class="mt-2">Industries we have worked with</h1>
+    <p class="mt-6 text-xl">We provide audit, tax, accounting and advisory services to businesses across a range of sectors.</p>
+    <table class="ltable mt-10"><tbody>
+      {sectors.map((s, i) => <tr class="row"><td class="num w-14 text-ink-soft">{String(i + 1).padStart(2, '0')}</td><td class="text-xl text-pen">{s}</td></tr>)}
+    </tbody></table>
+  </section>
+</Base>

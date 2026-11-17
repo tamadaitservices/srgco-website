@@ -1,0 +1,39 @@
+---
+import { firm, offices, services } from '../data/site';
+---
+<footer class="mt-28 border-t-[3px] border-double border-ink bg-paper-deep/70">
+  <div class="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-4">
+    <div>
+      <p class="brand font-serif text-2xl font-semibold text-pen">{firm.name}</p>
+      <p class="label mt-1">Chartered Accountants · Est. {firm.established}</p>
+      <p class="mt-4 text-base">{firm.closing}</p>
+    </div>
+    <div>
+      <p class="label mb-3">Services</p>
+      <ul class="space-y-1 text-base">
+        {services.map((s) => <li><a class="link" href={`/services/${s.slug}`}>{s.title}</a></li>)}
+      </ul>
+    </div>
+    {offices.filter((o) => o.primary).map((o) => (
+      <div>
+        <p class="label mb-3">{o.city} office</p>
+        <address class="text-base not-italic">
+          {o.address?.map((l) => <span class="block">{l}</span>)}
+          <span class="block">{o.city} – {o.postal}</span>
+          <a class="link mt-2 block" href={`tel:${o.telHref}`}>{o.tel}</a>
+          <a class="link block" href={`mailto:${o.email}`}>{o.email}</a>
+        </address>
+      </div>
+    ))}
+  </div>
+  <div class="mx-auto max-w-6xl border-t border-rule px-5 py-6">
+    <p class="label">
+      Serving
+      <a class="link" href="/chartered-accountants-hyderabad">Hyderabad</a> ·
+      <a class="link" href="/chartered-accountants-vijayawada">Vijayawada</a> ·
+      <a class="link" href="/chartered-accountants-rajahmundry">Rajahmundry</a> ·
+      <a class="link" href="/chartered-accountants-kakinada">Kakinada</a>
+    </p>
+    <p class="label mt-3">© {new Date().getFullYear()} {firm.name}. All rights reserved.</p>
+  </div>
+</footer>

@@ -1,0 +1,272 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { firm, services, values, promises, timeline, sectors } from '../data/site';
+
+const years = new Date().getFullYear() - firm.established;
+const faq = [
+  { q: 'Where are S.R. Garimella & Co. offices located?', a: 'We have offices in Hyderabad (Himayat Nagar) and Vijayawada (Veterinary Colony), and also serve clients in Rajahmundry and Kakinada.' },
+  { q: 'What services do you provide?', a: 'Audit & assurance, direct tax advisory and litigation support, international taxation and transfer pricing, GST and customs, 100% EOU compliance, corporate law, corporate finance advisory, and accounting outsourcing.' },
+  { q: 'Since when has the firm been practising?', a: 'The firm was established in 1989 by Late Sri Garimella Someswara Rao, FCA, and was reconstituted as a partnership firm in 2009.' },
+];
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
+const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
+---
+<Base
+  title="Chartered Accountants in Hyderabad & Vijayawada | S.R. Garimella & Co."
+  description="S.R. Garimella & Co. — Chartered Accountants since 1989. Audit & assurance, direct and indirect tax, GST, transfer pricing, corporate law and advisory in Hyderabad, Vijayawada, Rajahmundry and Kakinada."
+  jsonLd={faqLd}
+>
+
+  <!-- ============ Navy & Copper design (editorial) ============ -->
+  <div class="nv-only">
+    <section class="nv-hero">
+      <div class="nv-wrap nv-meta" data-in style="--d:.05s">
+        <span>SRG / 001</span>
+        <span>Hyderabad · Vijayawada · 17.39° N · 78.49° E</span>
+        <span>Est. MCMLXXXIX</span>
+      </div>
+      <div class="nv-wrap nv-hero-body">
+        <div>
+          <p class="nv-kicker label" data-in style="--d:.15s"><i></i>Chartered Accountants · Practising since {firm.established}</p>
+          <h1 data-in style="--d:.25s">S.R. Garimella <em>&amp;</em> Co.</h1>
+          <span class="nv-rule" aria-hidden="true"></span>
+          <p class="nv-tag" data-in style="--d:.55s">Building trust through professional excellence.</p>
+        </div>
+        <div class="nv-hero-right" data-in style="--d:.7s">
+          <p>{firm.description}</p>
+          <a class="nv-btn solid" href="/contact">Schedule a consultation <span>→</span></a>
+          <a class="nv-btn line" href="/services">Explore our services <span>→</span></a>
+        </div>
+        <div class="nv-scroll" aria-hidden="true"><b>SCROLL</b><i></i></div>
+      </div>
+      <ul class="nv-stats" aria-label="Firm at a glance" data-in style="--d:.9s">
+        <li><strong>{firm.established}</strong><span>Established</span></li>
+        <li><strong data-count={years}>{years}</strong><span>Years of practice</span></li>
+        <li><strong data-count={services.length}>{services.length}</strong><span>Practice areas</span></li>
+        <li><strong data-count="4">4</strong><span>Cities served</span></li>
+      </ul>
+    </section>
+
+    <section class="band band-light nv-sec">
+      <div class="nv-wrap nv-split">
+        <div><p class="nv-eyebrow"><i></i>Who we are</p><p class="nv-secno">Section 01</p></div>
+        <div>
+          <h2 class="nv-h2">A firm built on <em>trust</em>, <em>competence</em> and the long view.</h2>
+          <p class="nv-lead">{firm.description}</p>
+          <p class="nv-body">{firm.approach}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-dark nv-sec">
+      <div class="nv-wrap">
+        <p class="nv-eyebrow"><i></i>What we do</p>
+        <h2 class="nv-h2 mt-6 max-w-4xl">Eight practice areas, <em>one</em> standard.</h2>
+        <div class="nv-grid">
+          {services.map((sv, k) => (
+            <a class="nv-card" href={`/services/${sv.slug}`}>
+              <Icon name={sv.icon} size={40} />
+              <span class="fol">{String(k + 1).padStart(2, '0')} /</span>
+              <h3>{sv.title}</h3>
+              <p>{sv.short}</p>
+              <span class="more">Read more →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-light nv-sec">
+      <div class="nv-wrap nv-split">
+        <div><p class="nv-eyebrow"><i></i>Our legacy</p><p class="nv-secno">Section 02</p></div>
+        <div>
+          <h2 class="nv-h2">Over three decades of <em>trusted</em> professional services.</h2>
+          <div class="nv-rows">
+            {timeline.map((t) => (<div class="nv-row year"><span class="n">{t.year}</span><span class="t">{t.text}</span></div>))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-dark nv-sec">
+      <div class="nv-wrap nv-split">
+        <div><p class="nv-eyebrow"><i></i>Why work with us</p><p class="nv-secno">Section 03</p></div>
+        <div>
+          <h2 class="nv-h2">Four undertakings clients can <em>rely on.</em></h2>
+          <div class="nv-rows">
+            {promises.map((pr, k) => (<div class="nv-row"><span class="n">{String(k + 1).padStart(2, '0')}</span><span class="t">{pr}</span></div>))}
+          </div>
+          <ul class="nv-chips" aria-label="Our principles">{values.map((v) => <li>{v.name}</li>)}</ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="band band-light nv-sec">
+      <div class="nv-wrap">
+        <p class="nv-eyebrow"><i></i>Sectors</p>
+        <h2 class="nv-h2 mt-6 max-w-4xl">Industries we have <em>worked with.</em></h2>
+        <ul class="nv-cells">
+          {sectors.map((x, k) => (<li><span class="n">{k + 1}</span><span class="t">{x}</span></li>))}
+        </ul>
+        <a class="nv-btn line mt-10 max-w-xs" href="/industries">All industries we serve <span>→</span></a>
+      </div>
+    </section>
+
+    <section class="band band-dark nv-sec">
+      <div class="nv-wrap nv-split nv-faq">
+        <div><p class="nv-eyebrow"><i></i>Queries</p><p class="nv-secno">Section 04</p></div>
+        <div>
+          <h2 class="nv-h2">Quick <em>answers.</em></h2>
+          <div class="mt-10">
+            {faq.map((f) => (<details><summary>{f.q}</summary><p>{f.a}</p></details>))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band nv-cta nv-sec">
+      <div class="nv-wrap">
+        <p class="nv-eyebrow"><i></i>Begin a conversation</p>
+        <h2 class="nv-h2">A short conversation is the <em>best place to start.</em></h2>
+        <p>Tell us a little about your business and what you are trying to address. We will arrange a call with the team member best suited to the work.</p>
+        <a class="nv-btn solid" href="/contact">Schedule a consultation <span>→</span></a>
+      </div>
+    </section>
+  </div>
+
+  <div class="classic-only">
+  <!-- Hero: a ledger page -->
+  <section class="ledger">
+    <div class="mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-14 md:grid-cols-[1.35fr_1fr] md:pt-20">
+      <div class="md:pl-[clamp(2rem,6vw,5.5rem)]">
+        <p class="label">Chartered Accountants · Est. {firm.established}</p>
+        <h1 class="mt-5">Building trust through <em>professional excellence.</em></h1>
+        <p class="label mt-8 text-ink">Tax &nbsp;|&nbsp; Assurance &nbsp;|&nbsp; Advisory</p>
+        <p class="mt-6 max-w-xl text-xl">{firm.description}</p>
+        <div class="mt-10 flex flex-wrap gap-4">
+          <a href="/contact" class="btn">Make an enquiry</a>
+          <a href="/services" class="btn ghost">View services</a>
+        </div>
+      </div>
+
+      <!-- Account card -->
+      <div class="relative self-start">
+        <div class="box double bg-paper p-6">
+          <p class="label">Firm particulars</p>
+          <table class="ltable mt-3 text-base">
+            <tbody>
+              <tr><td class="label !text-[0.65rem]">Established</td><td class="num text-right">{firm.established}</td></tr>
+              <tr><td class="label !text-[0.65rem]">Partnership since</td><td class="num text-right">{firm.partnershipYear}</td></tr>
+              <tr><td class="label !text-[0.65rem]">Years of practice</td><td class="num text-right" data-count={years} data-suffix="+">{years}+</td></tr>
+              <tr><td class="label !text-[0.65rem]">Practice areas</td><td class="num text-right" data-count={services.length}>{services.length}</td></tr>
+              <tr><td class="label !text-[0.65rem]">Offices</td><td class="text-right">Hyderabad, Vijayawada</td></tr>
+              <tr><td class="label !text-[0.65rem]">Also at</td><td class="text-right">Rajahmundry, Kakinada</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="stamp absolute -bottom-6 -right-2 bg-paper/60 md:-right-6" aria-hidden="true">
+          Audited<br />&amp; Assured<br />· {firm.established} ·
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Index of services -->
+  <section class="mx-auto max-w-6xl px-5 pt-24">
+    <p class="label">Index of services</p>
+    <h2 class="mt-2">Eight practice areas, one standard of work.</h2>
+    <table class="ltable mt-10">
+      <thead>
+        <tr><th class="w-20">Folio</th><th>Particulars</th><th class="hidden md:table-cell">Scope</th></tr>
+      </thead>
+      <tbody>
+        {services.map((s, i) => (
+          <tr class="row">
+            <td class="num text-ink-soft">{String(i + 1).padStart(2, '0')}</td>
+            <td>
+              <a href={`/services/${s.slug}`} class="flex items-center gap-3 font-medium text-pen">
+                <Icon name={s.icon} size={26} class="shrink-0 text-ink" />
+                <span class="text-xl underline decoration-rule decoration-2 underline-offset-4">{s.title}</span>
+              </a>
+              <p class="mt-1 text-base md:hidden">{s.short}</p>
+            </td>
+            <td class="hidden text-base md:table-cell">{s.short}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Legacy: year / particulars -->
+  <section class="mx-auto max-w-6xl px-5 pt-24">
+    <p class="label">Our legacy</p>
+    <h2 class="mt-2">Over three decades of trusted professional services.</h2>
+    <table class="ltable mt-10">
+      <thead><tr><th class="w-28">Year</th><th>Particulars</th></tr></thead>
+      <tbody>
+        {timeline.map((t) => (
+          <tr><td class="num text-xl text-pen">{t.year}</td><td class="text-xl">{t.text}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Principles + undertakings -->
+  <section class="mx-auto grid max-w-6xl gap-14 px-5 pt-24 md:grid-cols-2">
+    <div>
+      <p class="label">What we stand for</p>
+      <h2 class="mt-2">Our principles</h2>
+      <ul class="mt-8">
+        {values.map((v, i) => (
+          <li class="flex items-center gap-4 border-b border-rule py-3">
+            <span class="num w-8 text-sm text-ink-soft">({roman[i]})</span>
+            <Icon name={v.icon} size={28} class="text-ink" />
+            <span class="text-xl text-pen">{v.name}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <div>
+      <p class="label">Our promise to clients</p>
+      <h2 class="mt-2">Our undertakings</h2>
+      <ol class="mt-8">
+        {promises.map((p, i) => (
+          <li class="flex gap-4 border-b border-rule py-3">
+            <span class="num w-8 pt-1 text-sm text-stamp">{String(i + 1).padStart(2, '0')}</span>
+            <span class="text-xl">{p}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="mx-auto max-w-4xl px-5 pt-24">
+    <p class="label">Queries</p>
+    <h2 class="mt-2">Quick answers</h2>
+    <div class="mt-8">
+      {faq.map((f) => (
+        <details class="border-b border-rule py-4">
+          <summary class="cursor-pointer text-xl font-medium text-pen">{f.q}</summary>
+          <p class="mt-2 text-lg">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="mx-auto max-w-6xl px-5 pt-24">
+    <div class="box double bg-wash/60 p-10 text-center md:p-16">
+      <p class="label">Begin an engagement</p>
+      <h2 class="mt-3">A short conversation is the best place to start.</h2>
+      <p class="mx-auto mt-4 max-w-xl text-xl">Tell us a little about your business and what you are trying to address.</p>
+      <a href="/contact" class="btn mt-8">Get in touch</a>
+    </div>
+  </section>
+  </div>
+</Base>

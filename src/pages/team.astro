@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import { team } from '../data/site';
+const ld = team.map((p) => ({ '@context': 'https://schema.org', '@type': 'Person', name: p.name, jobTitle: 'Chartered Accountant', worksFor: { '@type': 'AccountingService', name: 'S.R. Garimella & Co.' }, knowsAbout: p.focus }));
+---
+<Base title="Our Leadership" description="Meet the partners and professionals of S.R. Garimella & Co. — specialists in direct tax, assurance, international tax, GST and accounting." jsonLd={ld}>
+  <section class="mx-auto max-w-5xl px-5 pt-14">
+    <p class="label">Our people</p>
+    <h1 class="mt-2">Our leadership</h1>
+    <div class="mt-12 grid gap-8 md:grid-cols-2">
+      {team.map((p, i) => (
+        <article class="box p-7">
+          <p class="num text-xs text-stamp">{String(i + 1).padStart(2, '0')}</p>
+          <h3 class="mt-1 text-3xl">{p.name}</h3>
+          <p class="label mt-2">{p.quals}</p>
+          <table class="ltable mt-5 text-base">
+            <tbody>
+              <tr><td class="label !text-[0.65rem] w-32">With firm since</td><td class="num">{p.since}</td></tr>
+              <tr><td class="label !text-[0.65rem]">Specialisation</td><td>{p.focus}</td></tr>
+              {p.note && <tr><td class="label !text-[0.65rem]">Certified</td><td>{p.note}</td></tr>}
+            </tbody>
+          </table>
+        </article>
+      ))}
+    </div>
+  </section>
+</Base>

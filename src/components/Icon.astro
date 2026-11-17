@@ -1,0 +1,38 @@
+---
+// Doodle line icons (single-stroke, slightly imperfect on purpose).
+interface Props { name: string; size?: number; class?: string }
+const { name, size = 44, class: cls = '' } = Astro.props;
+const paths: Record<string, string> = {
+  glasses: 'M4 26c0-6 4-10 9-10s9 4 9 10-4 9-9 9-9-3-9-9zM26 26c0-6 4-10 9-10s9 4 9 10-4 9-9 9-9-3-9-9zM22 24c1-1.5 3-1.5 4 0M3 22L2 14M45 22l1-8',
+  gavel: 'M24 8l9 9-7 7-9-9zM28 28l14 14M10 42h20M18 21L6 33l5 5 12-12',
+  globe: 'M24 5c10 0 19 8 19 19s-9 19-19 19S5 35 5 24 14 5 24 5zM5 24h38M24 5c-8 8-8 30 0 38M24 5c8 8 8 30 0 38',
+  receipt: 'M10 5h28v38l-5-3-5 3-4-3-4 3-5-3-5 3zM16 15h16M16 22h16M16 29h10',
+  stamp: 'M18 6h12v14l7 6v6H11v-6l7-6zM8 40h32M12 36h24',
+  building: 'M8 43V12l16-6 16 6v31zM6 43h36M16 18h4M28 18h4M16 26h4M28 26h4M16 34h4M28 34h4',
+  chart: 'M6 6v36h36M12 32l9-10 7 6 12-16M33 12h7v7',
+  calculator: 'M10 5h28v38H10zM15 11h18v8H15zM16 26h3M23 26h3M30 26h3M16 33h3M23 33h3M30 33h3',
+  shield: 'M24 5l16 6v12c0 10-7 17-16 20C15 40 8 33 8 23V11zM16 24l6 6 11-12',
+  briefcase: 'M6 15h36v26H6zM17 15v-6h14v6M6 26h36M21 26v4h6v-4',
+  scales: 'M24 6v36M12 42h24M8 14h32M8 14l-5 15c3 4 10 4 13 0zM40 14l-5 15c3 4 10 4 13 0z',
+  arrows: 'M6 18h30l-6-6M42 30H12l6 6',
+  cap: 'M4 18l20-9 20 9-20 9zM12 23v10c6 5 18 5 24 0V23M44 18v12',
+  bulb: 'M24 5c-8 0-13 6-13 13 0 5 3 8 5 11v5h16v-5c2-3 5-6 5-11 0-7-5-13-13-13zM18 38h12M20 43h8',
+  phone: 'M12 6h8l3 10-5 3c3 6 7 10 12 12l3-5 10 3v8c0 3-3 5-6 5C20 42 6 28 6 12c0-3 3-6 6-6z',
+  mail: 'M5 10h38v28H5zM5 12l19 15 19-15',
+  pin: 'M24 44S10 30 10 20a14 14 0 0128 0c0 10-14 24-14 24zM24 15a5 5 0 100 10 5 5 0 000-10z',
+};
+---
+<svg
+  class={cls}
+  width={size}
+  height={size}
+  viewBox="0 0 48 48"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+>
+  <path d={paths[name] ?? paths.shield} />
+</svg>

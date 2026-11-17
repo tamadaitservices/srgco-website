@@ -1,0 +1,304 @@
+---
+import Base from '../layouts/Base.astro';
+import { offices, firm, enquiryTypes } from '../data/site';
+---
+<Base title="Contact Us" description="Contact S.R. Garimella & Co., Chartered Accountants — offices in Hyderabad and Vijayawada. Call, email or write your enquiry and watch it take shape as a letter.">
+  <section class="mx-auto max-w-6xl px-5 pt-14">
+    <p class="label">Connect with us</p>
+    <h1 class="mt-2">Make an enquiry</h1>
+    <p class="mt-4 max-w-2xl text-xl">{firm.closing} Fill in the details and your letter to the firm is written beside you.</p>
+
+    <div class="mt-12 grid items-start gap-12 lg:grid-cols-[1fr_1.08fr]">
+      <!-- FORM -->
+      <form id="contact-form" method="post" action="/api/contact" class="space-y-6">
+        <div class="hidden" aria-hidden="true"><label>Leave empty <input name="website" tabindex="-1" autocomplete="off" /></label></div>
+        <fieldset class="types">
+          <legend class="label">1 · What is your enquiry about?</legend>
+          <div class="type-grid" role="radiogroup">
+            {enquiryTypes.map((t) => (
+              <label class="type-chip">
+                <input type="radio" name="topic" value={t.title} data-type={t.slug} class="sr-only" />
+                <span>{t.chip}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <div id="extra-fields" class="space-y-6"></div>
+
+        <p class="label !mt-8">2 · Your details</p>
+        <label class="block"><span class="label">Your name</span>
+          <input name="name" data-bind="name" required maxlength="120" autocomplete="name" class="field" /></label>
+        <label class="block"><span class="label">Email</span>
+          <input name="email" data-bind="email" type="email" required maxlength="160" autocomplete="email" class="field" /></label>
+        <label class="block"><span class="label">Phone (optional)</span>
+          <input name="phone" data-bind="phone" type="tel" maxlength="30" autocomplete="tel" class="field" /></label>
+
+        <label class="block"><span class="label">Your message</span>
+          <textarea name="message" data-bind="message" required rows="5" maxlength="3000" class="field border border-current p-3"></textarea></label>
+        <button type="submit" class="btn">Send enquiry</button>
+        <p id="form-status" class="text-lg" role="status"></p>
+      </form>
+
+      <!-- LIVE LETTER -->
+      <div id="types-data" hidden data-json={JSON.stringify(enquiryTypes)}></div>
+      <aside class="doc-wrap" aria-label="Live preview of your enquiry letter">
+        <div class="doc" id="doc" aria-hidden="true">
+          <div class="doc-stamp" id="doc-stamp">Received<br /><small>with thanks</small></div>
+
+          <header class="doc-head">
+            <p class="doc-firm">S.R. Garimella &amp; Co.</p>
+            <p class="doc-sub">Chartered Accountants · Est. {firm.established}</p>
+            <p class="doc-sub">Hyderabad · Vijayawada · Rajahmundry · Kakinada</p>
+          </header>
+
+          <p class="doc-title"><span id="doc-title">Letter of Enquiry</span></p>
+          <p class="doc-date"><span id="doc-date"></span></p>
+
+          <p class="doc-to">To,<br />The Partners,<br />S.R. Garimella &amp; Co., Chartered Accountants</p>
+
+          <p class="doc-line" data-line="topic"><b>Subject:</b> Enquiry regarding <span class="out empty" data-out="topic" data-ph="our services"></span></p>
+
+          <p class="doc-line">Dear Sirs,</p>
+
+          <div id="doc-particulars" class="doc-part" hidden>
+            <p class="doc-h">Particulars of enquiry</p>
+            <ul id="doc-part-list"></ul>
+          </div>
+
+          <p class="doc-line" data-line="message"><span class="out msg empty" data-out="message" data-ph="Your message will be written here as you type it…"></span></p>
+
+          <div id="doc-encl" class="doc-encl" hidden>
+            <p class="doc-h">Documents to keep ready</p>
+            <ol id="doc-encl-list"></ol>
+          </div>
+
+          <ul class="doc-contact">
+            <li data-line="email"><b>Email</b><span class="out empty" data-out="email" data-ph="your@email.com"></span></li>
+            <li data-line="phone"><b>Phone</b><span class="out empty" data-out="phone" data-ph="—"></span></li>
+          </ul>
+
+          <div class="doc-sign" data-line="name">
+            <p>Yours sincerely,</p>
+            <p class="sig" id="doc-sig"><span class="out empty" data-out="name" data-ph=""></span></p>
+            <p class="sig-line"><span class="out empty" data-out="name-print" data-ph="Your name"></span></p>
+          </div>
+        </div>
+        <p class="label doc-note" id="doc-note">Choose an enquiry type — the matching document appears here</p>
+      </aside>
+    </div>
+
+    <div class="mt-20 grid gap-8 md:grid-cols-2">
+      {offices.filter((o) => o.primary).map((o) => (
+        <div class="box double p-6">
+          <h2 class="text-3xl">{o.city}</h2>
+          <address class="mt-3 text-lg not-italic">
+            {o.address?.map((l) => <span class="block">{l}</span>)}
+            <span class="block">{o.city} – {o.postal}</span>
+            <a class="link block" href={`tel:${o.telHref}`}>Tel: {o.tel}</a>
+            <a class="link block" href={`mailto:${o.email}`}>{o.email}</a>
+          </address>
+        </div>
+      ))}
+    </div>
+    <p class="mt-6 text-lg">Other locations: Rajahmundry and Kakinada.</p>
+  </section>
+
+  <style is:global>
+    .doc-wrap { position: relative; }
+    @media (min-width: 1024px) { .doc-wrap { position: sticky; top: 6.5rem; } }
+    /* the letter is always paper-white with dark ink, whatever the theme */
+    .doc {
+      position: relative;
+      background: #fffdf8;
+      color: #1d2842;
+      font-family: 'Newsreader Variable', Georgia, serif;
+      font-size: 1.02rem;
+      line-height: 1.6;
+      padding: clamp(1.4rem, 3.2vw, 2.4rem);
+      border-radius: 3px;
+      box-shadow: 0 1px 0 #e8e3d6, 0 24px 50px -22px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.15);
+      transform: rotate(0.6deg);
+      min-height: 36rem;
+      overflow: hidden;
+    }
+    .doc::before { /* folded corner */
+      content: ''; position: absolute; top: 0; right: 0; width: 2.2rem; height: 2.2rem;
+      background: linear-gradient(225deg, #cfc9b8 0 50%, #f4f0e4 50% 100%); border-bottom-left-radius: 4px;
+    }
+    .doc b { font-weight: 600; color: #0b1426; }
+    .doc-head { border-bottom: 2px solid #1d2842; padding-bottom: 0.7rem; margin-bottom: 1rem; }
+    .doc-firm { font-family: 'Instrument Serif', Georgia, serif; font-size: 1.9rem; line-height: 1.05; color: #0b1426; }
+    .doc-sub { font-size: 0.66rem; letter-spacing: 0.2em; text-transform: uppercase; color: #5a6479; font-family: 'Inter Variable', sans-serif; margin-top: 0.15rem; }
+    .doc-date { text-align: right; font-size: 0.95rem; color: #5a6479; margin-bottom: 0.8rem; }
+    .doc-to { margin-bottom: 0.8rem; }
+    .doc-line { margin: 0.5rem 0; padding: 0.05rem 0.3rem; margin-left: -0.3rem; transition: background 0.3s; }
+    .doc-contact { list-style: none; margin: 0.9rem 0; padding: 0; }
+    .doc-contact li { display: flex; gap: 1rem; padding: 0.05rem 0.3rem; margin-left: -0.3rem; transition: background 0.3s; }
+    .doc-contact b { width: 4.2rem; flex: none; font-family: 'Inter Variable', sans-serif; font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; color: #5a6479; padding-top: 0.28rem; font-weight: 500; }
+    .doc-sign { margin-top: 1.6rem; padding: 0.1rem 0.3rem; margin-left: -0.3rem; transition: background 0.3s; }
+    .doc .active { background: rgba(255, 213, 79, 0.42); }
+    .doc .out { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .doc .out.empty::before { content: attr(data-ph); color: #b3b9c8; font-style: italic; }
+    .doc .out.msg { display: block; min-height: 5.4rem; line-height: 1.9rem; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(1.9rem - 1px), #e4e1d6 calc(1.9rem - 1px), #e4e1d6 1.9rem); }
+    .doc .out.flash { animation: docflash 0.7s ease; }
+    @keyframes docflash { from { background-color: rgba(255, 213, 79, 0.8); } }
+    .sig { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-size: 2.5rem; line-height: 1.1; color: #1d2842; min-height: 3rem; margin-top: 0.3rem; transform: rotate(-3deg); transform-origin: left; display: inline-block; clip-path: inset(-10% 100% -10% 0); transition: clip-path 1.1s cubic-bezier(.4,0,.2,1); }
+    .sig.on { clip-path: inset(-10% -2% -10% 0); }
+    .sig-line { border-top: 1px solid #1d2842; margin-top: 0.1rem; padding-top: 0.2rem; font-size: 0.85rem; color: #5a6479; max-width: 18rem; }
+    .doc-stamp {
+      position: absolute; right: clamp(1rem, 4vw, 2.4rem); bottom: 5.5rem; z-index: 2; pointer-events: none;
+      font-family: 'IBM Plex Mono', monospace; font-weight: 500; text-transform: uppercase; letter-spacing: 0.2em; font-size: 1.05rem; text-align: center; line-height: 1.5;
+      color: #a8332c; border: 4px double #a8332c; padding: 0.6rem 1.1rem; border-radius: 4px; opacity: 0; transform: rotate(-12deg) scale(2);
+    }
+    .doc-stamp small { font-size: 0.62rem; letter-spacing: 0.3em; }
+    .doc.sent .doc-stamp { animation: docstamp 0.7s cubic-bezier(.2,.9,.3,1.3) forwards; }
+    @keyframes docstamp { 0% { opacity: 0; transform: rotate(-20deg) scale(2.4); } 65% { opacity: 1; transform: rotate(-10deg) scale(0.94); } 100% { opacity: 0.9; transform: rotate(-11deg) scale(1); } }
+    .doc-note { margin-top: 1rem; text-align: center; }
+    .types { border: 0; padding: 0; margin: 0; }
+    .types legend { margin-bottom: 0.7rem; padding: 0; }
+    .type-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .type-chip span { display: inline-block; padding: 0.45rem 0.95rem; border: 1px solid currentColor; font-size: 0.95rem; cursor: pointer; transition: background 0.2s, color 0.2s, transform 0.2s; user-select: none; }
+    .type-chip:hover span { transform: translateY(-2px); background: var(--color-wash); }
+    .type-chip input:checked + span { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); transform: none; }
+    .type-chip input:focus-visible + span { outline: 2px solid var(--color-stamp); outline-offset: 2px; }
+    .doc-title { text-align: center; font-family: 'Inter Variable', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: #0b1426; border-top: 1px solid #1d2842; border-bottom: 1px solid #1d2842; padding: 0.45rem 0.4rem; margin: 0.2rem 0 0.9rem; }
+    .doc-h { font-family: 'Inter Variable', sans-serif; font-size: 0.66rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #5a6479; margin-bottom: 0.3rem; }
+    .doc-part { margin: 0.9rem 0; }
+    .doc-part ul { list-style: none; margin: 0; padding: 0; border-top: 1px solid #d9d5c7; }
+    .doc-part li { display: grid; grid-template-columns: 10.5rem 1fr; gap: 0.8rem; border-bottom: 1px solid #d9d5c7; padding: 0.3rem 0.3rem; margin-left: -0.3rem; font-size: 0.97rem; transition: background 0.3s; }
+    .doc-part li b { font-family: 'Inter Variable', sans-serif; font-size: 0.72rem; font-weight: 500; color: #5a6479; padding-top: 0.2rem; }
+    .doc-encl { margin: 1rem 0 0.4rem; }
+    .doc-encl ol { list-style: decimal; margin: 0.2rem 0 0; padding-left: 1.5rem; font-size: 0.93rem; color: #3a4560; }
+    .doc.swap { animation: docswap 0.6s cubic-bezier(.2,.7,.2,1); }
+    @keyframes docswap { 0% { opacity: 0; transform: translateX(34px) rotate(2.6deg); } 100% { opacity: 1; transform: rotate(0.6deg); } }
+    @media (max-width: 520px) { .doc-part li { grid-template-columns: 1fr; gap: 0; } }
+    select.field { appearance: none; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: calc(100% - 14px) 55%, calc(100% - 9px) 55%; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 1.6rem; color: inherit; }
+    select.field option { color: #1d2842; background: #fff; }
+    textarea.field { resize: vertical; }
+    @media (prefers-reduced-motion: reduce) { .doc.swap, .doc .out.flash, .doc.sent .doc-stamp { animation: none; } .doc.sent .doc-stamp { opacity: 0.9; transform: rotate(-11deg); } .sig { transition: none; } }
+  </style>
+
+  <script>
+    type Field = { id: string; label: string; type: 'text' | 'select'; placeholder?: string; options?: string[] };
+    type EType = { slug: string; chip: string; title: string; docTitle: string; fields: Field[]; enclosures: string[] };
+
+    const types: EType[] = JSON.parse((document.getElementById('types-data') as HTMLElement).dataset.json || '[]');
+    const form = document.getElementById('contact-form') as HTMLFormElement | null;
+    const status = document.getElementById('form-status');
+    const doc = document.getElementById('doc');
+    const sig = document.getElementById('doc-sig');
+    const extra = document.getElementById('extra-fields')!;
+    const partWrap = document.getElementById('doc-particulars')!;
+    const partList = document.getElementById('doc-part-list')!;
+    const enclWrap = document.getElementById('doc-encl')!;
+    const enclList = document.getElementById('doc-encl-list')!;
+    const docTitle = document.getElementById('doc-title')!;
+    const note = document.getElementById('doc-note')!;
+    const dateEl = document.getElementById('doc-date');
+    if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+    const setOut = (key: string, value: string) => {
+      const keys = key === 'name' ? ['name', 'name-print'] : [key];
+      for (const k of keys) {
+        document.querySelectorAll<HTMLElement>(`[data-out="${k}"]`).forEach((el) => {
+          if (el.textContent === value) return;
+          el.textContent = value;
+          el.classList.toggle('empty', !value);
+          el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+        });
+      }
+      if (key === 'name') sig?.classList.toggle('on', value.trim().length > 1);
+    };
+
+    function bind(el: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement) {
+      const key = el.dataset.bind!;
+      const update = () => setOut(key, el.value.trim() ? (key === 'message' ? el.value : el.value.trim()) : '');
+      el.addEventListener('input', update);
+      el.addEventListener('change', update);
+      el.addEventListener('focus', () => {
+        document.querySelectorAll('.doc .active').forEach((n) => n.classList.remove('active'));
+        document.querySelector(`.doc [data-line="${key}"]`)?.classList.add('active');
+      });
+      el.addEventListener('blur', () => document.querySelectorAll('.doc .active').forEach((n) => n.classList.remove('active')));
+      update();
+    }
+    form?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('[data-bind]').forEach(bind);
+
+    function renderType(slug: string | null, animate = true) {
+      const t = types.find((x) => x.slug === slug) || null;
+      docTitle.textContent = t ? t.docTitle : 'Letter of Enquiry';
+      setOut('topic', t ? t.title : '');
+      note.textContent = t ? 'Your document updates as you type' : 'Choose an enquiry type — the matching document appears here';
+
+      // form: type-specific questions
+      extra.innerHTML = '';
+      partList.innerHTML = '';
+      for (const f of t?.fields ?? []) {
+        const label = document.createElement('label');
+        label.className = 'block';
+        const cap = document.createElement('span');
+        cap.className = 'label';
+        cap.textContent = f.label;
+        let input: HTMLInputElement | HTMLSelectElement;
+        if (f.type === 'select') {
+          input = document.createElement('select');
+          input.className = 'field';
+          const o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Select…'; input.appendChild(o0);
+          for (const o of f.options ?? []) { const op = document.createElement('option'); op.value = o; op.textContent = o; input.appendChild(op); }
+        } else {
+          input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'field';
+          input.maxLength = 120;
+          if (f.placeholder) input.placeholder = f.placeholder;
+        }
+        input.name = 'd:' + f.label;
+        input.dataset.bind = 'x-' + f.id;
+        label.append(cap, input);
+        extra.appendChild(label);
+        bind(input);
+
+        // matching row in the document
+        const li = document.createElement('li');
+        li.dataset.line = 'x-' + f.id;
+        const b = document.createElement('b'); b.textContent = f.label;
+        const sp = document.createElement('span'); sp.className = 'out empty'; sp.dataset.out = 'x-' + f.id; sp.dataset.ph = '—';
+        li.append(b, sp);
+        partList.appendChild(li);
+      }
+      partWrap.hidden = !(t && t.fields.length);
+
+      // checklist
+      enclList.innerHTML = '';
+      for (const item of t?.enclosures ?? []) { const li = document.createElement('li'); li.textContent = item; enclList.appendChild(li); }
+      enclWrap.hidden = !(t && t.enclosures.length);
+
+      if (animate && doc) { doc.classList.remove('swap'); void doc.offsetWidth; doc.classList.add('swap'); }
+    }
+
+    form?.querySelectorAll<HTMLInputElement>('input[name="topic"]').forEach((r) =>
+      r.addEventListener('change', () => renderType(r.dataset.type || null)),
+    );
+
+    // deep link: /contact?type=gst-customs
+    const wanted = new URLSearchParams(location.search).get('type');
+    const pre = wanted && form?.querySelector<HTMLInputElement>(`input[name="topic"][data-type="${wanted}"]`);
+    if (pre) { pre.checked = true; renderType(wanted, false); } else renderType(null, false);
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (status) status.textContent = 'Sending…';
+      try {
+        const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
+        const data = await res.json().catch(() => ({}));
+        if (res.ok) {
+          doc?.classList.add('sent');
+          if (status) status.textContent = 'Thank you — your enquiry has been received. We will be in touch soon.';
+        } else if (status) status.textContent = data.error || 'Something went wrong. Please call or email us.';
+      } catch {
+        if (status) status.textContent = 'Network error. Please call or email us.';
+      }
+    });
+  </script>
+</Base>

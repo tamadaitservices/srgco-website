@@ -1,0 +1,23 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import { services } from '../../data/site';
+---
+<Base title="Our Professional Services" description="Audit & assurance, tax advisory & litigation, international taxation, GST & customs, 100% EOU, corporate law, corporate finance and accounting outsourcing.">
+  <section class="mx-auto max-w-5xl px-5 pt-14">
+    <p class="label">Service portfolio</p>
+    <h1 class="mt-2">Our professional services</h1>
+    <table class="ltable mt-10">
+      <thead><tr><th class="w-20">Folio</th><th>Particulars</th><th class="hidden md:table-cell">Scope</th></tr></thead>
+      <tbody>
+        {services.map((s, i) => (
+          <tr class="row">
+            <td class="num text-ink-soft">{String(i + 1).padStart(2, '0')}</td>
+            <td><a href={`/services/${s.slug}`} class="flex items-center gap-3 text-pen"><Icon name={s.icon} size={28} class="shrink-0" /><span class="text-xl underline decoration-rule decoration-2 underline-offset-4">{s.title}</span></a></td>
+            <td class="hidden text-base md:table-cell">{s.short}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </section>
+</Base>
