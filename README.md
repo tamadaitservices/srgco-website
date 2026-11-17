@@ -16,13 +16,13 @@ npm run dev        # http://localhost:4321
 npm run build      # outputs dist/
 npm start          # serves the production build (node dist/server/entry.mjs)
 ```
-Requires Node 20+.
+Requires Node 22.23.4 or newer (Astro 7).
 
 ## Deploy on Hostinger (Node.js web app, GitHub connected)
 | Setting | Value |
 | --- | --- |
 | Framework | Astro / Other (Node.js) |
-| Node version | 20 or 22 |
+| Node version | 24.x (or 22.x, must be >= 22.23.4) |
 | Install command | `npm install` |
 | Build command | `npm run build` |
 | Start command | `npm start` (runs `node dist/server/entry.mjs`) |
