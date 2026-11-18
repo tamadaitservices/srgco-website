@@ -141,21 +141,55 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
 
   <!-- ============ Clean design ============ -->
   <div class="cl-only">
-    <section class="cl-hero">
+    <section class="cl-hero" id="cl-hero" data-types={JSON.stringify(enquiryTypes)}>
       <div class="cl-wrap cl-hero-grid">
-        <div>
-          <p class="cl-pill" data-in style="--d:.05s"><i></i>Chartered Accountants · Est. {firm.established}</p>
-          <h1 data-in style="--d:.15s">Building trust through <em>professional excellence.</em></h1>
-          <p class="cl-lead" data-in style="--d:.28s">{firm.description}</p>
-          <ul class="cl-trust" data-in style="--d:.4s">
-            <li>Offices in Hyderabad &amp; Vijayawada</li>
-            <li>{years}+ years of practice</li>
-            <li>Tax · Assurance · Advisory</li>
-          </ul>
-          <a class="cl-call" href="tel:+914066462292" data-in style="--d:.5s">
-            <span class="cl-call-ico"><Icon name="phone" size={20} /></span>
-            <span><small>Prefer to talk? Call us</small><strong>040-66462292</strong></span>
-          </a>
+        <div class="cl-hero-left">
+          <div class="cl-hero-text">
+            <p class="cl-pill" data-in style="--d:.05s"><i></i>Chartered Accountants · Est. {firm.established}</p>
+            <h1 data-in style="--d:.15s">Building trust through <em>professional excellence.</em></h1>
+            <p class="cl-lead" data-in style="--d:.28s">{firm.description}</p>
+            <ul class="cl-trust" data-in style="--d:.4s">
+              <li>Offices in Hyderabad &amp; Vijayawada</li>
+              <li>{years}+ years of practice</li>
+              <li>Tax · Assurance · Advisory</li>
+            </ul>
+            <a class="cl-call" href="tel:+914066462292" data-in style="--d:.5s">
+              <span class="cl-call-ico"><Icon name="phone" size={20} /></span>
+              <span><small>Prefer to talk? Call us</small><strong>040-66462292</strong></span>
+            </a>
+          </div>
+
+          <!-- Live enquiry letter: appears while the form is being filled -->
+          <div class="cl-hero-doc" aria-hidden="true">
+            <div class="doc" id="hd-doc">
+              <div class="doc-stamp">Received<br /><small>with thanks</small></div>
+              <header class="doc-head">
+                <p class="doc-firm">S.R. Garimella &amp; Co.</p>
+                <p class="doc-sub">Chartered Accountants · Est. {firm.established}</p>
+                <p class="doc-sub">Hyderabad · Vijayawada · Rajahmundry · Kakinada</p>
+              </header>
+              <p class="doc-title"><span id="hd-title">Letter of Enquiry</span></p>
+              <p class="doc-date"><span id="hd-date"></span></p>
+              <p class="doc-to">To,<br />The Partners,<br />S.R. Garimella &amp; Co., Chartered Accountants</p>
+              <p class="doc-line" data-hl="topic"><b>Subject:</b> Enquiry regarding <span class="out empty" data-h="topic" data-ph="our services"></span></p>
+              <p class="doc-line">Dear Sirs,</p>
+              <p class="doc-line" data-hl="message"><span class="out msg empty" data-h="message" data-ph="Your message will be written here as you type it…"></span></p>
+              <div id="hd-encl" class="doc-encl" hidden>
+                <p class="doc-h">Documents to keep ready</p>
+                <ol id="hd-encl-list"></ol>
+              </div>
+              <ul class="doc-contact">
+                <li data-hl="email"><b>Email</b><span class="out empty" data-h="email" data-ph="your@email.com"></span></li>
+                <li data-hl="phone"><b>Phone</b><span class="out empty" data-h="phone" data-ph="—"></span></li>
+              </ul>
+              <div class="doc-sign" data-hl="name">
+                <p>Yours sincerely,</p>
+                <p class="sig" id="hd-sig"><span class="out empty" data-h="name" data-ph=""></span></p>
+                <p class="sig-line"><span class="out empty" data-h="name2" data-ph="Your name"></span></p>
+              </div>
+            </div>
+            <p class="label doc-note">Your enquiry letter is being written as you type</p>
+          </div>
         </div>
 
         <!-- Quick enquiry -->
@@ -334,6 +368,8 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
           });
           if (res.ok) {
             document.getElementById('cl-enq-name')!.textContent = ', ' + name.split(' ')[0];
+            document.getElementById('hd-doc')?.classList.add('sent');
+            document.getElementById('cl-hero')!.dataset.sent = '1';
             box.classList.add('done');
             form.reset();
           } else {
@@ -345,6 +381,71 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
           msg.textContent = 'Network problem. Please try again or call 040-66462292.';
         }
         btn.disabled = false;
+      });
+    }
+
+    // ---- Live enquiry letter: text fades out, the letter writes itself as the form is filled ----
+    const hero = document.getElementById('cl-hero');
+    const doc = document.getElementById('hd-doc');
+    if (form && hero && doc) {
+      type EType = { slug: string; title: string; docTitle: string; enclosures: string[] };
+      const types: EType[] = JSON.parse(hero.dataset.types || '[]');
+      const title = document.getElementById('hd-title')!;
+      const encl = document.getElementById('hd-encl')!;
+      const enclList = document.getElementById('hd-encl-list')!;
+      const sig = document.getElementById('hd-sig')!;
+      const dateEl = document.getElementById('hd-date');
+      if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+      const setOut = (key: string, value: string) => {
+        const keys = key === 'name' ? ['name', 'name2'] : [key];
+        for (const k of keys) {
+          doc.querySelectorAll<HTMLElement>(`[data-h="${k}"]`).forEach((el) => {
+            if (el.textContent === value) return;
+            el.textContent = value;
+            el.classList.toggle('empty', !value);
+            el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+          });
+        }
+        if (key === 'name') sig.classList.toggle('on', value.trim().length > 1);
+      };
+      const field = (n: string) => form.elements.namedItem(n) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+      const read = (n: string) => field(n).value.trim();
+
+      const renderType = () => {
+        const t = types.find((x) => x.title === read('topic')) || null;
+        title.textContent = t ? t.docTitle : 'Letter of Enquiry';
+        setOut('topic', t ? t.title : '');
+        enclList.innerHTML = '';
+        for (const it of t?.enclosures ?? []) { const li = document.createElement('li'); li.textContent = it; enclList.appendChild(li); }
+        encl.hidden = !(t && t.enclosures.length);
+        doc.classList.remove('swap'); void doc.offsetWidth; doc.classList.add('swap');
+      };
+
+      const bindings: Record<string, () => void> = {
+        topic: renderType,
+        name: () => setOut('name', read('name')),
+        phone: () => setOut('phone', read('phone')),
+        email: () => setOut('email', read('email')),
+        message: () => setOut('message', field('message').value),
+      };
+      for (const [n, fn] of Object.entries(bindings)) {
+        const el = field(n);
+        el.addEventListener('input', fn);
+        el.addEventListener('change', fn);
+        el.addEventListener('focus', () => {
+          doc.querySelectorAll('.active').forEach((x) => x.classList.remove('active'));
+          doc.querySelector(`[data-hl="${n}"]`)?.classList.add('active');
+        });
+      }
+
+      const anyValue = () => ['topic', 'name', 'phone', 'email', 'message'].some((n) => field(n).value.trim() !== '');
+      form.addEventListener('focusin', () => hero.classList.add('is-filling'));
+      form.addEventListener('focusout', () => {
+        setTimeout(() => {
+          doc.querySelectorAll('.active').forEach((x) => x.classList.remove('active'));
+          if (!form.contains(document.activeElement) && !anyValue() && !hero.dataset.sent) hero.classList.remove('is-filling');
+        }, 150);
       });
     }
   </script>
