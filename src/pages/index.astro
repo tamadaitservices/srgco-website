@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
+import Mascot from '../components/Mascot.astro';
 import { firm, services, values, promises, timeline, sectors, offices, enquiryTypes } from '../data/site';
 
 const years = new Date().getFullYear() - firm.established;
@@ -193,7 +194,12 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
         </div>
 
         <!-- Quick enquiry -->
-        <div class="cl-enq" id="cl-enq" data-in style="--d:.35s">
+        <div class="cl-enq-wrap" data-in style="--d:.35s" id="cl-enq-wrap">
+        <div class="gari-peek" aria-hidden="true">
+          <p class="gari-bubble" id="gari-say">Hi! I'm Gari. Tell me what you need 👋</p>
+          <Mascot mood="wave" size="7.2rem" follow class="gari-home" />
+        </div>
+        <div class="cl-enq" id="cl-enq">
           <div id="cl-enq-form-wrap">
             <p class="cl-enq-title">Request a call back</p>
             <p class="cl-enq-sub">Tell us what you need. Our team will get in touch shortly.</p>
@@ -220,6 +226,7 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
             <p class="cl-enq-title">Thank you<span id="cl-enq-name"></span>.</p>
             <p class="cl-enq-sub">Your enquiry has reached our team. We will contact you shortly.</p>
           </div>
+        </div>
         </div>
       </div>
     </section>
@@ -344,7 +351,26 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
 
   <script>
     // Quick enquiry on the Clean home page -> /api/lead (emailed to the firm)
+    import { mood, say } from '../lib/gari';
     const form = document.getElementById('cl-quick') as HTMLFormElement | null;
+    const owl = document.querySelector('.gari-home');
+    const bub = document.getElementById('gari-say');
+    if (form && owl) {
+      const f = form.elements;
+      form.addEventListener('focusin', (e) => {
+        const n = (e.target as HTMLInputElement).name;
+        if (n === 'topic') { mood(owl, 'think'); say(bub, 'Pick the service you need help with.'); }
+        else if (n === 'name') { mood(owl, 'write'); say(bub, 'Nice to meet you! What is your name?'); }
+        else if (n === 'phone') { mood(owl, 'write'); say(bub, 'A mobile number so we can call you back.'); }
+        else if (n === 'email') { mood(owl, 'write'); say(bub, 'Email is optional, but handy for documents.'); }
+        else if (n === 'message') { mood(owl, 'write'); say(bub, 'A line or two is plenty. We will do the rest.'); }
+      });
+      form.addEventListener('change', (e) => {
+        const t = e.target as HTMLInputElement;
+        if (t.name === 'name' && t.value.trim().length > 1) say(bub, `Hello, ${t.value.trim().split(' ')[0]}! 😊`);
+      });
+      void f;
+    }
     if (form) {
       const msg = document.getElementById('cl-enq-msg')!;
       const box = document.getElementById('cl-enq')!;
@@ -357,10 +383,12 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
         const email = String(f.get('email') || '').trim();
         const digits = phone.replace(/\D/g, '');
         msg.className = 'cl-enq-msg err';
+        if (owl) mood(owl, 'worried');
         if (name.length < 2) { msg.textContent = 'Please enter your name.'; return; }
         if (digits.length < 10 || digits.length > 13) { msg.textContent = 'Please enter a valid mobile number.'; return; }
         if (email && !/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = 'That email address does not look right.'; return; }
         msg.className = 'cl-enq-msg'; msg.textContent = 'Sending…'; btn.disabled = true;
+        if (owl) { mood(owl, 'think'); say(bub, 'Sending your note to the team…'); }
         try {
           const res = await fetch('/api/lead', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -371,8 +399,10 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
             document.getElementById('hd-doc')?.classList.add('sent');
             document.getElementById('cl-hero')!.dataset.sent = '1';
             box.classList.add('done');
+            if (owl) { mood(owl, 'celebrate'); say(bub, 'Done! Our team will call you soon 🎉'); }
             form.reset();
           } else {
+            if (owl) { mood(owl, 'worried'); say(bub, 'Oops, that did not go through.'); }
             msg.className = 'cl-enq-msg err';
             msg.textContent = 'Sorry, we could not send that just now. Please call 040-66462292 or use the contact page.';
           }

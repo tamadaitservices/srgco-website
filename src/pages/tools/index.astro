@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
+import Mascot from '../../components/Mascot.astro';
 const tools = [
   { href: '/tools/income-tax-calculator', icon: 'calculator', title: 'Income tax calculator', text: 'Compare the old and new tax regimes side by side and see which one costs you less.' },
   { href: '/tools/gst-calculator', icon: 'receipt', title: 'GST calculator', text: 'Add or remove GST from any amount, with the CGST / SGST / IGST split.' },
@@ -14,6 +15,7 @@ const tools = [
   <section class="mx-auto max-w-6xl px-5 pt-14">
     <p class="label">Free tools</p>
     <h1 class="mt-2 !text-4xl md:!text-6xl">Tax &amp; compliance tools</h1>
+    <div class="gari-row mt-5" aria-hidden="true"><Mascot mood="wave" size="5rem" follow /><p class="gari-bubble left">I'll do the sums. Pick a tool!</p></div>
     <p class="mt-5 max-w-3xl text-xl">Quick, free tools for individuals and businesses. They give indicative answers — for advice on your own situation, talk to our team.</p>
     <div class="tool-hub">
       {tools.map((t) => (

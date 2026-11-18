@@ -1,0 +1,83 @@
+---
+// Gari, the firm's friendly owl. Decorative. The expression is driven by data-mood,
+// which scripts change at runtime (see src/lib/gari.ts).
+interface Props {
+  mood?: 'idle' | 'wave' | 'write' | 'think' | 'happy' | 'celebrate' | 'worried' | 'confused';
+  size?: string;
+  view?: 'full' | 'face';
+  follow?: boolean;
+  class?: string;
+}
+const { mood = 'idle', size = '8rem', view = 'full', follow = false, class: cls = '' } = Astro.props;
+const viewBox = view === 'face' ? '34 16 132 128' : '0 0 200 230';
+---
+<svg class:list={['mascot', cls]} viewBox={viewBox} style={`width:${size}`} data-mood={mood} data-follow={follow ? '' : undefined} aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <g class="m-all">
+    <ellipse class="m-shadow" cx="100" cy="224" rx="46" ry="6" fill="rgba(0,0,0,.2)" />
+    <g class="m-body">
+      <g fill="#f5a623" stroke="#12315a" stroke-width="3"><ellipse cx="80" cy="213" rx="16" ry="7" /><ellipse cx="120" cy="213" rx="16" ry="7" /></g>
+      <ellipse cx="100" cy="152" rx="58" ry="64" fill="#3b7fc4" stroke="#12315a" stroke-width="4" />
+      <ellipse cx="100" cy="164" rx="38" ry="44" fill="#fff3dc" />
+      <path d="M80 152q6 8 12 0M96 152q6 8 12 0M112 152q6 8 12 0M88 172q6 8 12 0M104 172q6 8 12 0M96 192q6 8 12 0" stroke="#e3caa0" stroke-width="3" fill="none" stroke-linecap="round" />
+      <g class="m-wing-l"><path d="M46 132c-22 14-26 46-10 64 10-6 22-30 24-58z" fill="#2f6cae" stroke="#12315a" stroke-width="4" stroke-linejoin="round" /></g>
+      <g class="m-wing-r"><path d="M154 132c22 14 26 46 10 64-10-6-22-30-24-58z" fill="#2f6cae" stroke="#12315a" stroke-width="4" stroke-linejoin="round" /></g>
+    </g>
+
+    <!-- tie -->
+    <g class="m-tie"><path d="M100 132l-21-10v20zM100 132l21-10v20z" fill="#c8814a" stroke="#12315a" stroke-width="3" stroke-linejoin="round" /><circle cx="100" cy="132" r="5" fill="#a8612c" stroke="#12315a" stroke-width="2.5" /></g>
+
+    <!-- ledger + pencil (write mood) -->
+    <g class="m-ledger">
+      <rect x="64" y="160" width="72" height="42" rx="5" fill="#fff" stroke="#12315a" stroke-width="4" />
+      <path d="M100 160v42M72 172h20M72 182h20M72 192h14M108 172h20M108 182h20M108 192h12" stroke="#9db4d3" stroke-width="3" stroke-linecap="round" />
+      <g class="m-pencil"><path d="M138 150l-18 30" stroke="#f5a623" stroke-width="8" stroke-linecap="round" /><path d="M121 178l-2 6 6-2z" fill="#12315a" /></g>
+    </g>
+
+    <g class="m-head">
+      <path d="M46 60l6-30 26 18z" fill="#3b7fc4" stroke="#12315a" stroke-width="4" stroke-linejoin="round" />
+      <path d="M154 60l-6-30-26 18z" fill="#3b7fc4" stroke="#12315a" stroke-width="4" stroke-linejoin="round" />
+      <ellipse cx="100" cy="90" rx="64" ry="56" fill="#3b7fc4" stroke="#12315a" stroke-width="4" />
+      <circle cx="72" cy="92" r="27" fill="#fff" /><circle cx="128" cy="92" r="27" fill="#fff" />
+      <g class="m-pupils"><g class="m-pupil"><circle cx="72" cy="94" r="11" fill="#12315a" /><circle cx="76" cy="90" r="3.5" fill="#fff" /></g><g class="m-pupil"><circle cx="128" cy="94" r="11" fill="#12315a" /><circle cx="132" cy="90" r="3.5" fill="#fff" /></g></g>
+      <ellipse class="m-lid" cx="72" cy="92" rx="28" ry="28" fill="#3b7fc4" /><ellipse class="m-lid" cx="128" cy="92" rx="28" ry="28" fill="#3b7fc4" />
+      <path class="m-eye-happy" d="M58 96q14-20 28 0M114 96q14-20 28 0" stroke="#12315a" stroke-width="6" fill="none" stroke-linecap="round" />
+      <circle cx="72" cy="92" r="29" fill="none" stroke="#12315a" stroke-width="5" /><circle cx="128" cy="92" r="29" fill="none" stroke="#12315a" stroke-width="5" /><path d="M100 90h0M99.5 90h1" stroke="#12315a" stroke-width="5" />
+      <path class="m-brow-w" d="M48 58l24 9M152 58l-24 9" stroke="#12315a" stroke-width="5" stroke-linecap="round" />
+      <path class="m-brow-c" d="M108 56q16-9 32 1" stroke="#12315a" stroke-width="5" fill="none" stroke-linecap="round" />
+      <ellipse cx="46" cy="116" rx="8" ry="5" fill="#ff9aa2" opacity=".55" /><ellipse cx="154" cy="116" rx="8" ry="5" fill="#ff9aa2" opacity=".55" />
+      <path d="M91 107l9 15 9-15q-9-6-18 0z" fill="#f5a623" stroke="#12315a" stroke-width="3" stroke-linejoin="round" />
+      <path class="m-sweat" d="M160 54c-7 10-9 16-2 19 7-2 7-9 2-19z" fill="#9bdcff" stroke="#12315a" stroke-width="2.5" />
+    </g>
+
+    <g class="m-q"><circle cx="160" cy="26" r="18" fill="#fff" stroke="#12315a" stroke-width="4" /><text x="160" y="35" text-anchor="middle" font-size="26" font-weight="800" fill="#12315a" font-family="system-ui, sans-serif">?</text></g>
+    <g class="m-confetti">
+      <rect class="cf" x="40" y="30" width="8" height="8" fill="#f5a623" style="--dx:-26px;--dy:-18px;--r:200deg" />
+      <rect class="cf" x="150" y="24" width="8" height="8" fill="#ff6b8b" style="--dx:28px;--dy:-22px;--r:-180deg" />
+      <circle class="cf" cx="30" cy="70" r="4.5" fill="#4ade80" style="--dx:-30px;--dy:6px;--r:0deg" />
+      <circle class="cf" cx="172" cy="64" r="4.5" fill="#38bdf8" style="--dx:30px;--dy:4px;--r:0deg" />
+      <rect class="cf" x="100" y="6" width="7" height="12" fill="#c8814a" style="--dx:4px;--dy:-26px;--r:140deg" />
+      <circle class="cf" cx="70" cy="12" r="4" fill="#facc15" style="--dx:-14px;--dy:-24px;--r:0deg" />
+      <rect class="cf" x="132" y="10" width="7" height="7" fill="#a78bfa" style="--dx:16px;--dy:-26px;--r:220deg" />
+    </g>
+  </g>
+</svg>
+
+<script>
+  // Pupils follow the pointer on mascots marked with data-follow.
+  const owls = Array.from(document.querySelectorAll<SVGElement>('.mascot[data-follow]'));
+  if (owls.length && matchMedia('(hover: hover)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let raf = 0, lx = 0, ly = 0;
+    const update = () => {
+      raf = 0;
+      for (const o of owls) {
+        const r = o.getBoundingClientRect();
+        if (!r.width || o.dataset.mood === 'happy' || o.dataset.mood === 'celebrate') continue;
+        const dx = lx - (r.left + r.width / 2), dy = ly - (r.top + r.height * 0.4);
+        const d = Math.min(1, Math.hypot(dx, dy) / 280), a = Math.atan2(dy, dx);
+        o.style.setProperty('--px', (Math.cos(a) * 6 * d).toFixed(2) + 'px');
+        o.style.setProperty('--py', (Math.sin(a) * 5 * d).toFixed(2) + 'px');
+      }
+    };
+    addEventListener('pointermove', (e) => { lx = e.clientX; ly = e.clientY; if (!raf) raf = requestAnimationFrame(update); }, { passive: true });
+  }
+</script>

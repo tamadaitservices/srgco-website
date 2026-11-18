@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Mascot from '../components/Mascot.astro';
 import { offices, firm, enquiryTypes } from '../data/site';
 ---
 <Base title="Contact Us" description="Contact S.R. Garimella & Co., Chartered Accountants — offices in Hyderabad and Vijayawada. Call, email or write your enquiry and watch it take shape as a letter.">
@@ -7,6 +8,7 @@ import { offices, firm, enquiryTypes } from '../data/site';
     <p class="label">Connect with us</p>
     <h1 class="mt-2">Make an enquiry</h1>
     <p class="mt-4 max-w-2xl text-xl">{firm.closing} Fill in the details and your letter to the firm is written beside you.</p>
+    <div class="gari-row mt-6" aria-hidden="true"><Mascot mood="wave" size="5.2rem" follow class="gari-contact" /><p class="gari-bubble left" id="gari-say">Hi! I'm Gari. Choose what you need and I'll help write your letter.</p></div>
 
     <div class="mt-12 grid items-start gap-12 lg:grid-cols-[1fr_1.08fr]">
       <!-- FORM -->
@@ -106,6 +108,7 @@ import { offices, firm, enquiryTypes } from '../data/site';
 
 
   <script>
+    import { mood, say } from '../lib/gari';
     type Field = { id: string; label: string; type: 'text' | 'select'; placeholder?: string; options?: string[] };
     type EType = { slug: string; chip: string; title: string; docTitle: string; fields: Field[]; enclosures: string[] };
 
@@ -212,17 +215,29 @@ import { offices, firm, enquiryTypes } from '../data/site';
     const pre = wanted && form?.querySelector<HTMLInputElement>(`input[name="topic"][data-type="${wanted}"]`);
     if (pre) { pre.checked = true; renderType(wanted, false); } else renderType(null, false);
 
+    const owl = document.querySelector('.gari-contact'), bub = document.getElementById('gari-say');
+    form?.addEventListener('focusin', (e) => {
+      const t = e.target as HTMLInputElement;
+      if (t.type === 'radio' || t.tagName === 'SELECT') { mood(owl, 'think'); say(bub, 'Great choice. I have updated the documents list for you.'); }
+      else if (t.name === 'name') { mood(owl, 'write'); say(bub, 'Your name goes on the letter as the signature.'); }
+      else if (t.name === 'phone') { mood(owl, 'write'); say(bub, 'We will call you on this number.'); }
+      else if (t.name === 'email') { mood(owl, 'write'); say(bub, 'Optional, but useful for sending documents.'); }
+      else if (t.name === 'message' || t.tagName === 'TEXTAREA') { mood(owl, 'write'); say(bub, 'Write freely. It appears in your letter.'); }
+    });
+    form?.addEventListener('change', (e) => { if ((e.target as HTMLInputElement).type === 'radio') { mood(owl, 'think'); say(bub, 'Nice. Now a few details about you.'); } });
     form?.addEventListener('submit', async (e) => {
       e.preventDefault();
+      mood(owl, 'think'); say(bub, 'Sending your letter…');
       if (status) status.textContent = 'Sending…';
       try {
         const res = await fetch(form.action, { method: 'POST', body: new FormData(form) });
         const data = await res.json().catch(() => ({}));
         if (res.ok) {
-          doc?.classList.add('sent');
+          doc?.classList.add('sent'); mood(owl, 'celebrate'); say(bub, 'Sent! The team will be in touch soon 🎉');
           if (status) status.textContent = 'Thank you — your enquiry has been received. We will be in touch soon.';
-        } else if (status) status.textContent = data.error || 'Something went wrong. Please call or email us.';
+        } else { mood(owl, 'worried'); say(bub, 'Hmm, that did not work. Please check the details.'); if (status) status.textContent = data.error || 'Something went wrong. Please call or email us.'; }
       } catch {
+        mood(owl, 'worried');
         if (status) status.textContent = 'Network error. Please call or email us.';
       }
     });

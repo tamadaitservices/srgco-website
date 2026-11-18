@@ -1,4 +1,5 @@
 ---
+import Mascot from './Mascot.astro';
 import { services, firm } from '../data/site';
 const topics = [...services.map((s) => s.title), 'Something else'];
 const wa = (import.meta.env.PUBLIC_WHATSAPP || (import.meta.env.DEV ? '910000000000' : '')).replace(/\D/g, '');
@@ -14,15 +15,18 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
       </a>
     )}
     <button class="fab chat" id="srg-open" type="button" aria-haspopup="dialog" aria-controls="srg-panel" aria-expanded="false">
-      <svg width="24" height="24" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h36v26H22l-10 8v-8H6z M14 18h20M14 25h12"/></svg>
+      <Mascot view="face" size="2rem" mood="wave" class="fab-gari" />
       <span class="fab-label">Enquire</span>
     </button>
   </div>
 
+  <p class="nudge gari-bubble" id="srg-nudge" hidden>Hi, I'm Gari! Need help with your filing? <button type="button" id="srg-nudge-x" aria-label="Dismiss">✕</button></p>
+
   <!-- Panel -->
   <section id="srg-panel" class="panel" role="dialog" aria-label="Enquiry assistant" aria-modal="false" hidden>
     <header class="panel-head">
-      <div>
+      <Mascot view="face" size="3rem" mood="wave" class="head-gari" />
+      <div class="head-txt">
         <p class="label">Enquiry desk</p>
         <p class="panel-title">S.R. Garimella &amp; Co.</p>
       </div>
@@ -68,11 +72,19 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
   #srg-widget .input:focus { outline: none; border-bottom-width: 2px; background: var(--color-wash); }
   #srg-widget .send { font-family: var(--font-mono); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; background: var(--color-ink); color: var(--color-paper); border: 0; padding: .45rem .9rem; cursor: pointer; }
   #srg-widget .fine { font-family: var(--font-mono); font-size: .62rem; letter-spacing: .04em; color: var(--color-ink-soft); padding: 0 1rem .7rem; }
+  #srg-widget .fab.chat .fab-gari { width: 2rem; margin: -.35rem 0 -.35rem -.3rem; }
+  #srg-widget .head-gari { width: 3rem; flex: none; margin-right: .6rem; }
+  #srg-widget .head-txt { flex: 1; }
+  #srg-widget .nudge { position: fixed; right: 1rem; bottom: 9.6rem; z-index: 59; margin: 0; padding-right: 1.9rem; }
+  #srg-widget .nudge[hidden] { display: none; }
+  #srg-widget .nudge::after { right: 1.4rem; bottom: -9px; transform: rotate(135deg); }
+  #srg-widget .nudge button { position: absolute; top: .2rem; right: .35rem; background: none; border: 0; cursor: pointer; font-size: .7rem; color: #12315a; }
   @media (max-width: 480px) { #srg-widget .fab-label { display: none; } #srg-widget .fab { padding: .85rem; } }
   @media (prefers-reduced-motion: reduce) { #srg-widget .fab { transition: none; } }
 </style>
 
 <script>
+  import { mood, type Mood } from '../lib/gari';
   const root = document.getElementById('srg-widget') as HTMLElement;
   const topics: string[] = JSON.parse(root.dataset.topics || '[]');
   const wa = root.dataset.wa || '';
@@ -118,6 +130,10 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
     { key: 'message', ask: 'Anything you would like us to know before we call? (optional)', optional: true, placeholder: 'A line or two about your requirement' },
   ];
 
+  const gari = Array.from(root.querySelectorAll<SVGElement>('.mascot'));
+  const feel = (m: Mood) => gari.forEach((g) => mood(g, m));
+  const stepMood: Record<string, Mood> = { topic: 'wave', name: 'idle', phone: 'write', email: 'think', city: 'think', message: 'write' };
+  const nudge = document.getElementById('srg-nudge') as HTMLElement;
   const data: Record<string, string> = {};
   let idx = -1;
   let started = false;
@@ -135,6 +151,7 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
 
   function renderStep() {
     const s = steps[idx];
+    feel(stepMood[s.key] || 'idle');
     chips.innerHTML = '';
     bot(s.ask);
     input.value = '';
@@ -162,6 +179,7 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
     if (!value && !s.optional) return;
     const err = s.validate?.(value);
     if (err) {
+      feel('worried');
       el('err', err);
       return;
     }
@@ -182,6 +200,7 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
 
   async function submit() {
     form.hidden = true;
+    feel('think');
     const wait = bot('Sending your details to the team…');
     try {
       const res = await fetch('/api/lead', {
@@ -192,6 +211,7 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
       wait.remove();
       if (res.ok) {
         done = true;
+        feel('celebrate');
         bot(`Thank you, ${data.name}. Your enquiry has been shared with our team, and we will get back to you shortly.`);
         if (wa) {
           const m = bot('Prefer to continue on WhatsApp? ');
@@ -203,6 +223,7 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
           m.appendChild(a);
         }
       } else {
+        feel('worried');
         el('err', 'Sorry, we could not send that just now. Please call us or use the contact page.');
         if (wa) {
           const m = bot('You can also reach us here: ');
@@ -221,6 +242,7 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
   }
 
   function open() {
+    nudge.hidden = true;
     panel.hidden = false;
     openBtn.setAttribute('aria-expanded', 'true');
     if (!started) {
@@ -244,4 +266,18 @@ const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire a
     e.preventDefault();
     answer(input.value);
   });
+</script>
+
+<script>
+  // One-time friendly nudge
+  const n = document.getElementById('srg-nudge');
+  const p = document.getElementById('srg-panel');
+  let seen = false;
+  try { seen = sessionStorage.getItem('srg-nudge') === '1'; } catch {}
+  if (n && !seen) {
+    setTimeout(() => {
+      if (p && p.hidden) { n.hidden = false; try { sessionStorage.setItem('srg-nudge', '1'); } catch {} setTimeout(() => (n.hidden = true), 9000); }
+    }, 12000);
+    document.getElementById('srg-nudge-x')?.addEventListener('click', () => (n.hidden = true));
+  }
 </script>

@@ -1,5 +1,6 @@
 ---
 import ToolLayout from '../layouts/ToolLayout.astro';
+import Mascot from '../components/Mascot.astro';
 import { HEALTH_QUESTIONS, OPTIONS } from '../data/health';
 import { services } from '../data/site';
 const svc = Object.fromEntries(services.map((s) => [s.slug, s.title]));
@@ -11,11 +12,14 @@ const svc = Object.fromEntries(services.map((s) => [s.slug, s.title]));
   intro="Ten quick questions on GST, TDS, accounts, audit, income tax, payroll and company filings. About two minutes — and you get a score with practical next steps."
 >
   <div class="hc-wrap tool-card" id="hc" data-q={JSON.stringify(HEALTH_QUESTIONS)} data-opts={JSON.stringify(OPTIONS)} data-svc={JSON.stringify(svc)}>
+    <div class="hc-gari" aria-hidden="true"><Mascot mood="wave" size="4.6rem" class="gari-hc" /></div>
     <div id="hc-body" aria-live="polite"></div>
   </div>
 </ToolLayout>
 
 <script>
+  import { mood } from '../lib/gari';
+  const owl = document.querySelector('.gari-hc');
   type Q = { id: string; area: string; q: string; hint: string; service: string; fix: string };
   type Opt = { label: string; score: number | null };
   const root = document.getElementById('hc')!;
@@ -31,6 +35,7 @@ const svc = Object.fromEntries(services.map((s) => [s.slug, s.title]));
 
   function question() {
     const q = Qs[i];
+    mood(owl, i === 0 ? 'wave' : i % 2 ? 'think' : 'idle');
     const pctDone = Math.round((i / Qs.length) * 100);
     body.innerHTML = `
       <div class="hc-progress"><span>Question ${i + 1} of ${Qs.length}</span><div class="hc-bar"><i style="width:${pctDone}%"></i></div></div>
@@ -60,6 +65,7 @@ const svc = Object.fromEntries(services.map((s) => [s.slug, s.title]));
     });
     const pct = max ? Math.round((got / max) * 100) : 100;
     const b = bandOf(pct);
+    mood(owl, pct >= 80 ? 'celebrate' : pct >= 50 ? 'think' : 'worried');
     const C = 2 * Math.PI * 54;
     body.innerHTML = `
       <div class="hc-result">
@@ -101,7 +107,7 @@ const svc = Object.fromEntries(services.map((s) => [s.slug, s.title]));
       try {
         const res = await fetch('/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: 'Compliance health check', name, phone, email, message: summary, page: '/health-check', website: f.get('website') }) });
         msg.textContent = res.ok ? 'Thank you — our team will call you shortly.' : 'Sorry, we could not send that just now. Please call 040-66462292.';
-        if (res.ok) form.reset();
+        if (res.ok) { form.reset(); mood(owl, 'celebrate'); }
       } catch { msg.textContent = 'Network problem. Please try again.'; }
     });
   }

@@ -1,9 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import Mascot from '../components/Mascot.astro';
 ---
 <Base title="Page not found" description="This page could not be found." noindex>
-  <section class="mx-auto max-w-3xl px-5 pt-24 text-center">
-    <h1>Page not found</h1>
-    <p class="mt-4 text-xl">It seems this page was never written. <a class="link text-xl" href="/">Back to home →</a></p>
+  <section class="mx-auto max-w-3xl px-5 pt-20 text-center">
+    <Mascot mood="confused" size="9rem" follow class="mx-auto" />
+    <h1 class="mt-4">Page not found</h1>
+    <p class="mt-4 text-xl">Hoo? Even Gari can't find this page. It seems it was never written. <a class="link text-xl" href="/">Back to home →</a></p>
   </section>
 </Base>

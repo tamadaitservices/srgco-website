@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Mascot from '../components/Mascot.astro';
 import { enquiryTypes, offices } from '../data/site';
 import { BOOKING } from '../data/booking';
 const topics = enquiryTypes.map((t) => t.title);
@@ -9,6 +10,7 @@ const topics = enquiryTypes.map((t) => t.title);
     <p class="label">Book a consultation</p>
     <h1 class="mt-2 !text-4xl md:!text-6xl">Book a call with a CA</h1>
     <p class="mt-5 max-w-3xl text-xl">Pick a topic, a day and a time. We will confirm your slot by phone or email. All times are Indian Standard Time (IST).</p>
+    <div class="gari-row mt-6" aria-hidden="true"><Mascot mood="wave" size="5rem" follow class="gari-book" /><p class="gari-bubble left" id="gari-say">Hi! I'm Gari. Let's find a time that suits you.</p></div>
 
     <div class="tool-grid bk-grid" id="bk" data-topics={JSON.stringify(topics)} data-modes={JSON.stringify(BOOKING.modes)}>
       <div class="tool-card bk-main">
@@ -49,6 +51,7 @@ const topics = enquiryTypes.map((t) => t.title);
 </Base>
 
 <script>
+  import { mood, say } from '../lib/gari';
   import { availableDays, slotsOn, fmtDay, fmtTime, weekday } from '../data/booking';
   const root = document.getElementById('bk')!;
   const topics: string[] = JSON.parse(root.dataset.topics!);
@@ -56,6 +59,7 @@ const topics = enquiryTypes.map((t) => t.title);
   const state = { topic: topics[topics.length - 1], mode: 'phone', date: '', time: '' };
   const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
   const $ = (id: string) => document.getElementById(id)!;
+  const owl = document.querySelector('.gari-book'), bub = $('gari-say');
   const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -84,20 +88,21 @@ const topics = enquiryTypes.map((t) => t.title);
       <p class="tool-note">This is a request — our team will confirm it by phone or email.</p>`;
   }
 
-  $('bk-topics').addEventListener('change', (e) => { state.topic = (e.target as HTMLInputElement).value; summary(); });
-  $('bk-modes').addEventListener('change', (e) => { state.mode = (e.target as HTMLInputElement).value; summary(); });
+  $('bk-topics').addEventListener('change', (e) => { state.topic = (e.target as HTMLInputElement).value; mood(owl, 'think'); say(bub, 'Good topic. How shall we meet?'); summary(); });
+  $('bk-modes').addEventListener('change', (e) => { state.mode = (e.target as HTMLInputElement).value; mood(owl, 'think'); say(bub, 'Now pick a day that works for you.'); summary(); });
   $('bk-days').addEventListener('click', (e) => {
     const b = (e.target as HTMLElement).closest('button'); if (!b) return;
-    state.date = b.dataset.d!; state.time = '';
+    state.date = b.dataset.d!; state.time = ''; mood(owl, 'think'); say(bub, 'And a time slot?');
     document.querySelectorAll('.bk-day').forEach((x) => x.classList.toggle('on', x === b));
     times(); summary();
   });
   $('bk-times').addEventListener('click', (e) => {
     const b = (e.target as HTMLElement).closest('button'); if (!b) return;
-    state.time = b.dataset.t!; times(); summary();
+    state.time = b.dataset.t!; mood(owl, 'write'); say(bub, 'Lovely. Fill in your details and send.'); times(); summary();
   });
   // pick the first available day by default
   if (days.length) (document.querySelector('.bk-day') as HTMLButtonElement).click();
+  mood(owl, 'wave'); say(bub, "Hi! I'm Gari. Let's find a time that suits you.");
   summary();
 
   const form = $('bk-form') as HTMLFormElement;
@@ -111,6 +116,7 @@ const topics = enquiryTypes.map((t) => t.title);
     if (name.length < 2) { msg.textContent = 'Please enter your name.'; return; }
     if (digits.length < 10 || digits.length > 13) { msg.textContent = 'Please enter a valid mobile number.'; return; }
     if (email && !/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = 'That email address does not look right.'; return; }
+    mood(owl, 'think'); say(bub, 'Sending your request…');
     msg.textContent = 'Sending your request…';
     ($('bk-submit') as HTMLButtonElement).disabled = true;
     try {
@@ -126,6 +132,7 @@ const topics = enquiryTypes.map((t) => t.title);
         const z = (x: Date) => x.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
         const gcal = 'https://calendar.google.com/calendar/render?' + new URLSearchParams({ action: 'TEMPLATE', text: 'Consultation with S.R. Garimella & Co. (to be confirmed)', details: `Topic: ${state.topic}`, dates: `${z(startUtc)}/${z(endUtc)}` });
         $('bk-summary').hidden = true;
+        mood(owl, 'celebrate'); say(bub, 'Booked! See you soon 🎉');
         const done = $('bk-done'); done.hidden = false;
         done.innerHTML = `<svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><circle class="c1" cx="32" cy="32" r="28" fill="none" stroke="#16a34a" stroke-width="4"/><path class="c2" d="M19 33l9 9 17-19" fill="none" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <h2 class="tool-h2">Request received</h2><p class="tool-big bk-when">${esc(data.when || '')}</p>
