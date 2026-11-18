@@ -513,6 +513,20 @@ a.link:hover {
   left: calc(clamp(0.75rem, 5vw, 4.4rem) + 4px);
 }
 
+/* Narrow screens: content starts near the left edge, so the ruled lines and the
+   margin lines would run through the text. Keep only a slim margin rule in the gutter. */
+@media (max-width: 1100px) {
+  .ledger {
+    background-image: none;
+  }
+  .ledger::before {
+    left: 0.4rem;
+  }
+  .ledger::after {
+    left: calc(0.4rem + 4px);
+  }
+}
+
 /* ---------- Boxes, rules, tables ---------- */
 .box {
   border: 1px solid var(--color-ink);
