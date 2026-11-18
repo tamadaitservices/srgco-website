@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { firm, services, values, promises, timeline, sectors, offices } from '../data/site';
+import { firm, services, values, promises, timeline, sectors, offices, enquiryTypes } from '../data/site';
 
 const years = new Date().getFullYear() - firm.established;
 const faq = [
@@ -139,61 +139,100 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
     </section>
   </div>
 
-  <!-- ============ Clean design (minimal, bright) ============ -->
+  <!-- ============ Clean design ============ -->
   <div class="cl-only">
     <section class="cl-hero">
       <div class="cl-wrap cl-hero-grid">
         <div>
-          <p class="cl-eyebrow">Chartered Accountants · Hyderabad &amp; Vijayawada</p>
-          <h1>Building trust through <em>professional excellence.</em></h1>
-          <p class="cl-lead">{firm.description}</p>
-          <div class="cl-actions">
-            <a class="cl-btn" href="/contact">Make an enquiry</a>
-            <a class="cl-textlink" href="/services">View our services →</a>
+          <p class="cl-pill" data-in style="--d:.05s"><i></i>Chartered Accountants · Est. {firm.established}</p>
+          <h1 data-in style="--d:.15s">Building trust through <em>professional excellence.</em></h1>
+          <p class="cl-lead" data-in style="--d:.28s">{firm.description}</p>
+          <ul class="cl-trust" data-in style="--d:.4s">
+            <li>Offices in Hyderabad &amp; Vijayawada</li>
+            <li>{years}+ years of practice</li>
+            <li>Tax · Assurance · Advisory</li>
+          </ul>
+          <a class="cl-call" href="tel:+914066462292" data-in style="--d:.5s">
+            <span class="cl-call-ico"><Icon name="phone" size={20} /></span>
+            <span><small>Prefer to talk? Call us</small><strong>040-66462292</strong></span>
+          </a>
+        </div>
+
+        <!-- Quick enquiry -->
+        <div class="cl-enq" id="cl-enq" data-in style="--d:.35s">
+          <div id="cl-enq-form-wrap">
+            <p class="cl-enq-title">Request a call back</p>
+            <p class="cl-enq-sub">Tell us what you need. Our team will get in touch shortly.</p>
+            <form id="cl-quick" novalidate>
+              <input type="text" name="website" tabindex="-1" autocomplete="off" class="cl-hp" aria-hidden="true" />
+              <label class="cl-f"><span>What do you need help with?</span>
+                <select name="topic">
+                  <option value="">Select a service…</option>
+                  {enquiryTypes.map((t) => <option value={t.title}>{t.title}</option>)}
+                </select></label>
+              <div class="cl-row2">
+                <label class="cl-f"><span>Your name</span><input name="name" type="text" autocomplete="name" required maxlength="120" placeholder="Full name" /></label>
+                <label class="cl-f"><span>Phone</span><input name="phone" type="tel" autocomplete="tel" required maxlength="30" placeholder="Mobile number" /></label>
+              </div>
+              <label class="cl-f"><span>Email <em>(optional)</em></span><input name="email" type="email" autocomplete="email" maxlength="160" placeholder="you@company.com" /></label>
+              <label class="cl-f"><span>Message <em>(optional)</em></span><textarea name="message" rows="3" maxlength="600" placeholder="A line or two about your requirement"></textarea></label>
+              <button type="submit" class="cl-btn cl-enq-btn">Send enquiry <span aria-hidden="true">→</span></button>
+              <p class="cl-enq-msg" id="cl-enq-msg" role="status"></p>
+              <p class="cl-enq-note">Your details go only to our team. Prefer the full form? <a href="/contact">Open the detailed enquiry page</a>.</p>
+            </form>
+          </div>
+          <div class="cl-enq-ok" id="cl-enq-ok" role="status">
+            <svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true"><circle class="c1" cx="32" cy="32" r="28" fill="none" stroke="#16a34a" stroke-width="4"/><path class="c2" d="M19 33l9 9 17-19" fill="none" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <p class="cl-enq-title">Thank you<span id="cl-enq-name"></span>.</p>
+            <p class="cl-enq-sub">Your enquiry has reached our team. We will contact you shortly.</p>
           </div>
         </div>
-        <aside class="cl-glance" aria-label="Firm at a glance">
-          <dl>
-            <div><dt>Established</dt><dd>{firm.established}</dd></div>
-            <div><dt>Years of practice</dt><dd data-count={years} data-suffix="+">{years}+</dd></div>
-            <div><dt>Practice areas</dt><dd data-count={services.length}>{services.length}</dd></div>
-            <div><dt>Offices</dt><dd>Hyderabad · Vijayawada</dd></div>
-          </dl>
-        </aside>
       </div>
     </section>
+
+    <div class="cl-wrap cl-stats-wrap">
+      <ul class="cl-stats" aria-label="Firm at a glance">
+        <li class="cl-stat"><b>{firm.established}</b><span>Established</span></li>
+        <li class="cl-stat"><b data-count={years} data-suffix="+">{years}+</b><span>Years of practice</span></li>
+        <li class="cl-stat"><b data-count={services.length}>{services.length}</b><span>Practice areas</span></li>
+        <li class="cl-stat"><b data-count="4">4</b><span>Cities served</span></li>
+      </ul>
+    </div>
 
     <section class="cl-sec">
       <div class="cl-wrap">
         <div class="cl-head">
-          <p class="cl-eyebrow">Services</p>
-          <h2>Eight practice areas, one standard of work.</h2>
+          <p class="cl-eyebrow">Our services</p>
+          <h2>Eight practice areas, <em>one</em> standard of work.</h2>
           <p>From statutory audit and tax to GST, corporate law and advisory — everything a growing business needs from its chartered accountants.</p>
         </div>
         <div class="cl-grid">
-          {services.map((sv) => (
+          {services.map((sv, k) => (
             <a class="cl-card" href={`/services/${sv.slug}`}>
-              <span class="cl-ico"><Icon name={sv.icon} size={26} /></span>
+              <span class="cl-card-top"><span class="cl-ico"><Icon name={sv.icon} size={26} /></span><span class="cl-cnum">{String(k + 1).padStart(2, '0')}</span></span>
               <h3>{sv.title}</h3>
               <p>{sv.short}</p>
-              <span class="cl-more">Learn more →</span>
+              <span class="cl-more">Learn more <i>→</i></span>
             </a>
           ))}
         </div>
       </div>
     </section>
 
-    <section class="cl-sec cl-tint">
-      <div class="cl-wrap cl-two">
-        <div>
-          <p class="cl-eyebrow">About the firm</p>
-          <h2 class="mt-3">Technical expertise with practical business insight.</h2>
-          <p class="cl-lead" style="margin-top:1.4rem">{firm.description}</p>
-          <p style="margin-top:1rem">{firm.approach}</p>
-        </div>
-        <div>
-          <p class="cl-eyebrow">What we stand for</p>
-          <ul class="cl-checks">{values.map((v) => <li>{v.name}</li>)}</ul>
+    <section class="cl-sec cl-sec-flush">
+      <div class="cl-wrap">
+        <div class="cl-panel">
+          <div class="cl-panel-text">
+            <p class="cl-eyebrow cl-eyebrow-light">Why S.R. Garimella &amp; Co.</p>
+            <h2>Technical expertise with practical business insight.</h2>
+            <p>{firm.approach}</p>
+            <div class="cl-big"><b>{years}+</b><span>years of trusted<br />professional services</span></div>
+          </div>
+          <ul class="cl-values">
+            {values.map((v) => (
+              <li><span class="cl-vico"><Icon name={v.icon} size={24} /></span><span>{v.name}</span></li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>
@@ -202,11 +241,11 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
       <div class="cl-wrap">
         <div class="cl-head">
           <p class="cl-eyebrow">Our legacy</p>
-          <h2>Over three decades of trusted professional services.</h2>
+          <h2>Over three decades of <em>trusted</em> professional services.</h2>
         </div>
-        <div class="cl-steps">
-          {timeline.map((t) => (<div class="cl-step"><b>{t.year}</b><p>{t.text}</p></div>))}
-        </div>
+        <ol class="cl-time">
+          {timeline.map((t) => (<li><span class="cl-dot"></span><b>{t.year}</b><p>{t.text}</p></li>))}
+        </ol>
       </div>
     </section>
 
@@ -214,17 +253,12 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
       <div class="cl-wrap">
         <div class="cl-head">
           <p class="cl-eyebrow">Our promise to clients</p>
-          <h2>Four things you can rely on.</h2>
+          <h2>Four things you can <em>rely on.</em></h2>
         </div>
         <div class="cl-pair">
           {promises.map((pr, k) => (<div class="cl-prom"><b>{k + 1}</b><span>{pr}</span></div>))}
         </div>
-      </div>
-    </section>
-
-    <section class="cl-sec">
-      <div class="cl-wrap">
-        <div class="cl-head">
+        <div class="cl-head" style="margin-top:4.5rem">
           <p class="cl-eyebrow">Sectors</p>
           <h2>Experience across industries.</h2>
         </div>
@@ -232,7 +266,7 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
       </div>
     </section>
 
-    <section class="cl-sec cl-tint">
+    <section class="cl-sec">
       <div class="cl-wrap">
         <div class="cl-head">
           <p class="cl-eyebrow">Offices</p>
@@ -242,34 +276,78 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
         <div class="cl-offices">
           {offices.filter((o) => o.primary).map((o) => (
             <div class="cl-office">
+              <span class="cl-ico"><Icon name="pin" size={24} /></span>
               <h3>{o.city}</h3>
               <address>
                 {o.address?.map((l) => <span class="block">{l}</span>)}
                 <span class="block">{o.city} – {o.postal}</span>
-                <a href={`tel:${o.telHref}`} class="block" style="margin-top:.6rem">{o.tel}</a>
-                <a href={`mailto:${o.email}`} class="block">{o.email}</a>
               </address>
+              <div class="cl-office-links">
+                <a href={`tel:${o.telHref}`}><Icon name="phone" size={18} /> {o.tel}</a>
+                <a href={`mailto:${o.email}`}><Icon name="mail" size={18} /> {o.email}</a>
+              </div>
             </div>
           ))}
         </div>
       </div>
     </section>
 
-    <section class="cl-sec">
+    <section class="cl-sec cl-tint">
       <div class="cl-wrap">
         <div class="cl-head"><p class="cl-eyebrow">Questions</p><h2>Quick answers</h2></div>
         <div class="cl-faq">{faq.map((f) => (<details><summary>{f.q}</summary><p>{f.a}</p></details>))}</div>
       </div>
     </section>
 
-    <section class="cl-sec cl-cta">
+    <section class="cl-cta">
       <div class="cl-wrap">
         <h2>A short conversation is the best place to start.</h2>
         <p>Tell us a little about your business and what you are trying to address.</p>
-        <a class="cl-btn" href="/contact">Make an enquiry</a>
+        <a class="cl-btn" href="/contact">Make a detailed enquiry</a>
       </div>
     </section>
   </div>
+
+  <script>
+    // Quick enquiry on the Clean home page -> /api/lead (emailed to the firm)
+    const form = document.getElementById('cl-quick') as HTMLFormElement | null;
+    if (form) {
+      const msg = document.getElementById('cl-enq-msg')!;
+      const box = document.getElementById('cl-enq')!;
+      const btn = form.querySelector('button[type=submit]') as HTMLButtonElement;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const f = new FormData(form);
+        const name = String(f.get('name') || '').trim();
+        const phone = String(f.get('phone') || '').trim();
+        const email = String(f.get('email') || '').trim();
+        const digits = phone.replace(/\D/g, '');
+        msg.className = 'cl-enq-msg err';
+        if (name.length < 2) { msg.textContent = 'Please enter your name.'; return; }
+        if (digits.length < 10 || digits.length > 13) { msg.textContent = 'Please enter a valid mobile number.'; return; }
+        if (email && !/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = 'That email address does not look right.'; return; }
+        msg.className = 'cl-enq-msg'; msg.textContent = 'Sending…'; btn.disabled = true;
+        try {
+          const res = await fetch('/api/lead', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic: f.get('topic'), name, phone, email, message: f.get('message'), page: location.pathname + ' (home enquiry)', website: f.get('website') }),
+          });
+          if (res.ok) {
+            document.getElementById('cl-enq-name')!.textContent = ', ' + name.split(' ')[0];
+            box.classList.add('done');
+            form.reset();
+          } else {
+            msg.className = 'cl-enq-msg err';
+            msg.textContent = 'Sorry, we could not send that just now. Please call 040-66462292 or use the contact page.';
+          }
+        } catch {
+          msg.className = 'cl-enq-msg err';
+          msg.textContent = 'Network problem. Please try again or call 040-66462292.';
+        }
+        btn.disabled = false;
+      });
+    }
+  </script>
 
   <div class="classic-only">
   <!-- Hero: a ledger page -->
