@@ -1,6 +1,13 @@
 ---
 import { firm, nav } from '../data/site';
 const path = Astro.url.pathname;
+const themes = [
+  { id: 'clean', label: 'Clean', title: 'Clean (light, minimal)', dot: 'd-clean' },
+  { id: 'navy', label: 'Navy', title: 'Navy & copper', dot: 'd-navy' },
+  { id: 'light', label: 'Ledger', title: 'Ledger (light)', dot: 'd-light' },
+  { id: 'dark', label: 'Night', title: 'Night (dark)', dot: 'd-dark' },
+  { id: 'emerald', label: 'Emerald', title: 'Emerald & gold', dot: 'd-emerald' },
+];
 ---
 <header class="site-header sticky top-0 z-30 border-b-[3px] border-double border-ink bg-paper/90 backdrop-blur-md">
   <div class="mx-auto flex max-w-[88rem] items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4">
@@ -21,12 +28,19 @@ const path = Astro.url.pathname;
 
     <div class="flex items-center gap-2 sm:gap-3">
     <a href="/contact" class="nv-pill">Schedule a consultation <span aria-hidden="true">→</span></a>
-    <div class="theme-switch" role="radiogroup" aria-label="Colour theme" id="theme-switch">
-      <button type="button" role="radio" aria-checked="false" data-theme-choice="navy" title="Navy &amp; copper"><span class="dot d-navy"></span><span class="hidden xl:inline">Navy</span></button>
-      <button type="button" role="radio" aria-checked="false" data-theme-choice="light" title="Ledger (light)"><span class="dot d-light"></span><span class="hidden xl:inline">Ledger</span></button>
-      <button type="button" role="radio" aria-checked="false" data-theme-choice="dark" title="Night (dark)"><span class="dot d-dark"></span><span class="hidden xl:inline">Night</span></button>
-      <button type="button" role="radio" aria-checked="false" data-theme-choice="emerald" title="Emerald &amp; gold"><span class="dot d-emerald"></span><span class="hidden xl:inline">Emerald</span></button>
+    <div class="theme-switch hidden sm:inline-flex" role="radiogroup" aria-label="Colour theme" id="theme-switch">
+      {themes.map((t) => (
+        <button type="button" role="radio" aria-checked="false" data-theme-choice={t.id} title={t.title}><span class={`dot ${t.dot}`}></span><span class="hidden 2xl:inline">{t.label}</span></button>
+      ))}
     </div>
+    <details class="theme-pop relative sm:hidden" id="theme-pop">
+      <summary class="theme-pop-btn" aria-label="Change colour theme"><span class="dot" id="theme-pop-dot"></span><span class="label !text-[0.62rem] !text-pen">Theme</span></summary>
+      <div class="theme-pop-menu" role="radiogroup" aria-label="Colour theme">
+        {themes.map((t) => (
+          <button type="button" role="radio" aria-checked="false" data-theme-choice={t.id}><span class={`dot ${t.dot}`}></span><span>{t.label}</span></button>
+        ))}
+      </div>
+    </details>
     <details class="relative md:hidden">
       <summary class="label cursor-pointer list-none whitespace-nowrap !text-pen" aria-label="Menu"><span class="text-xl leading-none sm:hidden" aria-hidden="true">☰</span><span class="hidden sm:inline">Menu ☰</span></summary>
       <nav class="absolute right-0 mt-3 w-56 border border-ink bg-paper p-4" aria-label="Mobile">
@@ -40,9 +54,15 @@ const path = Astro.url.pathname;
 <script>
   const root = document.documentElement;
   const group = document.getElementById('theme-switch');
-  const buttons = Array.from(group?.querySelectorAll<HTMLButtonElement>('button') ?? []);
+  const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-theme-choice]'));
+  const pop = document.getElementById('theme-pop') as HTMLDetailsElement | null;
+  const popDot = document.getElementById('theme-pop-dot');
+  const dotClass: Record<string, string> = { clean: 'd-clean', navy: 'd-navy', light: 'd-light', dark: 'd-dark', emerald: 'd-emerald' };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const sync = () => buttons.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.themeChoice === root.dataset.theme)));
+  const sync = () => {
+    buttons.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.themeChoice === root.dataset.theme)));
+    if (popDot) popDot.className = 'dot ' + (dotClass[root.dataset.theme || 'navy'] || 'd-navy');
+  };
   sync();
 
   function setTheme(next: string, origin: HTMLElement) {
@@ -64,11 +84,13 @@ const path = Astro.url.pathname;
     });
     t.finished.finally(() => root.classList.remove('theme-vt'));
   }
-  buttons.forEach((b) => b.addEventListener('click', () => setTheme(b.dataset.themeChoice!, b)));
+  buttons.forEach((b) => b.addEventListener('click', () => { setTheme(b.dataset.themeChoice!, b); if (pop) pop.open = false; }));
   group?.addEventListener('keydown', (e) => {
     if (!['ArrowRight', 'ArrowLeft'].includes(e.key)) return;
-    const i = buttons.findIndex((b) => b.dataset.themeChoice === root.dataset.theme);
-    const n = buttons[(i + (e.key === 'ArrowRight' ? 1 : buttons.length - 1)) % buttons.length];
+    const inline = Array.from(group.querySelectorAll<HTMLButtonElement>('button'));
+    const i = inline.findIndex((b) => b.dataset.themeChoice === root.dataset.theme);
+    const n = inline[(i + (e.key === 'ArrowRight' ? 1 : inline.length - 1)) % inline.length];
     n.focus(); setTheme(n.dataset.themeChoice!, n);
   });
+  document.addEventListener('click', (e) => { if (pop?.open && !pop.contains(e.target as Node)) pop.open = false; });
 </script>

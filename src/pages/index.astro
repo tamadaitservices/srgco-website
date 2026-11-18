@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import { firm, services, values, promises, timeline, sectors } from '../data/site';
+import { firm, services, values, promises, timeline, sectors, offices } from '../data/site';
 
 const years = new Date().getFullYear() - firm.established;
 const faq = [
@@ -135,6 +135,138 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
         <h2 class="nv-h2">A short conversation is the <em>best place to start.</em></h2>
         <p>Tell us a little about your business and what you are trying to address. We will arrange a call with the team member best suited to the work.</p>
         <a class="nv-btn solid" href="/contact">Schedule a consultation <span>→</span></a>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ Clean design (minimal, bright) ============ -->
+  <div class="cl-only">
+    <section class="cl-hero">
+      <div class="cl-wrap cl-hero-grid">
+        <div>
+          <p class="cl-eyebrow">Chartered Accountants · Hyderabad &amp; Vijayawada</p>
+          <h1>Building trust through <em>professional excellence.</em></h1>
+          <p class="cl-lead">{firm.description}</p>
+          <div class="cl-actions">
+            <a class="cl-btn" href="/contact">Make an enquiry</a>
+            <a class="cl-textlink" href="/services">View our services →</a>
+          </div>
+        </div>
+        <aside class="cl-glance" aria-label="Firm at a glance">
+          <dl>
+            <div><dt>Established</dt><dd>{firm.established}</dd></div>
+            <div><dt>Years of practice</dt><dd data-count={years} data-suffix="+">{years}+</dd></div>
+            <div><dt>Practice areas</dt><dd data-count={services.length}>{services.length}</dd></div>
+            <div><dt>Offices</dt><dd>Hyderabad · Vijayawada</dd></div>
+          </dl>
+        </aside>
+      </div>
+    </section>
+
+    <section class="cl-sec">
+      <div class="cl-wrap">
+        <div class="cl-head">
+          <p class="cl-eyebrow">Services</p>
+          <h2>Eight practice areas, one standard of work.</h2>
+          <p>From statutory audit and tax to GST, corporate law and advisory — everything a growing business needs from its chartered accountants.</p>
+        </div>
+        <div class="cl-grid">
+          {services.map((sv) => (
+            <a class="cl-card" href={`/services/${sv.slug}`}>
+              <span class="cl-ico"><Icon name={sv.icon} size={26} /></span>
+              <h3>{sv.title}</h3>
+              <p>{sv.short}</p>
+              <span class="cl-more">Learn more →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="cl-sec cl-tint">
+      <div class="cl-wrap cl-two">
+        <div>
+          <p class="cl-eyebrow">About the firm</p>
+          <h2 class="mt-3">Technical expertise with practical business insight.</h2>
+          <p class="cl-lead" style="margin-top:1.4rem">{firm.description}</p>
+          <p style="margin-top:1rem">{firm.approach}</p>
+        </div>
+        <div>
+          <p class="cl-eyebrow">What we stand for</p>
+          <ul class="cl-checks">{values.map((v) => <li>{v.name}</li>)}</ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cl-sec">
+      <div class="cl-wrap">
+        <div class="cl-head">
+          <p class="cl-eyebrow">Our legacy</p>
+          <h2>Over three decades of trusted professional services.</h2>
+        </div>
+        <div class="cl-steps">
+          {timeline.map((t) => (<div class="cl-step"><b>{t.year}</b><p>{t.text}</p></div>))}
+        </div>
+      </div>
+    </section>
+
+    <section class="cl-sec cl-tint">
+      <div class="cl-wrap">
+        <div class="cl-head">
+          <p class="cl-eyebrow">Our promise to clients</p>
+          <h2>Four things you can rely on.</h2>
+        </div>
+        <div class="cl-pair">
+          {promises.map((pr, k) => (<div class="cl-prom"><b>{k + 1}</b><span>{pr}</span></div>))}
+        </div>
+      </div>
+    </section>
+
+    <section class="cl-sec">
+      <div class="cl-wrap">
+        <div class="cl-head">
+          <p class="cl-eyebrow">Sectors</p>
+          <h2>Experience across industries.</h2>
+        </div>
+        <ul class="cl-pills">{sectors.map((x) => <li>{x}</li>)}</ul>
+      </div>
+    </section>
+
+    <section class="cl-sec cl-tint">
+      <div class="cl-wrap">
+        <div class="cl-head">
+          <p class="cl-eyebrow">Offices</p>
+          <h2>Visit or call us.</h2>
+          <p>Also serving clients in Rajahmundry and Kakinada.</p>
+        </div>
+        <div class="cl-offices">
+          {offices.filter((o) => o.primary).map((o) => (
+            <div class="cl-office">
+              <h3>{o.city}</h3>
+              <address>
+                {o.address?.map((l) => <span class="block">{l}</span>)}
+                <span class="block">{o.city} – {o.postal}</span>
+                <a href={`tel:${o.telHref}`} class="block" style="margin-top:.6rem">{o.tel}</a>
+                <a href={`mailto:${o.email}`} class="block">{o.email}</a>
+              </address>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="cl-sec">
+      <div class="cl-wrap">
+        <div class="cl-head"><p class="cl-eyebrow">Questions</p><h2>Quick answers</h2></div>
+        <div class="cl-faq">{faq.map((f) => (<details><summary>{f.q}</summary><p>{f.a}</p></details>))}</div>
+      </div>
+    </section>
+
+    <section class="cl-sec cl-cta">
+      <div class="cl-wrap">
+        <h2>A short conversation is the best place to start.</h2>
+        <p>Tell us a little about your business and what you are trying to address.</p>
+        <a class="cl-btn" href="/contact">Make an enquiry</a>
       </div>
     </section>
   </div>
