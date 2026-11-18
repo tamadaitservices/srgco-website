@@ -1,0 +1,142 @@
+---
+import Base from '../layouts/Base.astro';
+import { enquiryTypes, offices } from '../data/site';
+import { BOOKING } from '../data/booking';
+const topics = enquiryTypes.map((t) => t.title);
+---
+<Base title="Book a Consultation — Chartered Accountants in Hyderabad & Vijayawada" description="Request a consultation with S.R. Garimella & Co. Pick a service, a day and a time for a phone call, video call or office visit in Hyderabad or Vijayawada.">
+  <section class="mx-auto max-w-6xl px-5 pt-14">
+    <p class="label">Book a consultation</p>
+    <h1 class="mt-2 !text-4xl md:!text-6xl">Book a call with a CA</h1>
+    <p class="mt-5 max-w-3xl text-xl">Pick a topic, a day and a time. We will confirm your slot by phone or email. All times are Indian Standard Time (IST).</p>
+
+    <div class="tool-grid bk-grid" id="bk" data-topics={JSON.stringify(topics)} data-modes={JSON.stringify(BOOKING.modes)}>
+      <div class="tool-card bk-main">
+        <noscript><p class="tool-note">Booking needs JavaScript. Please <a class="link" href="/contact">use the contact page</a> or call 040-66462292.</p></noscript>
+        <p class="bk-step"><b>1</b> What would you like to discuss?</p>
+        <div class="seg" id="bk-topics"></div>
+
+        <p class="bk-step"><b>2</b> How should we meet?</p>
+        <div class="seg" id="bk-modes"></div>
+
+        <p class="bk-step"><b>3</b> Pick a day</p>
+        <div class="bk-days" id="bk-days" role="listbox" aria-label="Available days"></div>
+
+        <p class="bk-step"><b>4</b> Pick a time <small id="bk-tz">(IST)</small></p>
+        <div class="bk-times" id="bk-times" role="listbox" aria-label="Available times"><p class="tool-note">Choose a day first.</p></div>
+
+        <p class="bk-step"><b>5</b> Your details</p>
+        <form id="bk-form" novalidate>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="cl-hp" aria-hidden="true" />
+          <div class="tool-two">
+            <label class="tool-f"><span class="tool-lab">Your name</span><input class="field" name="name" maxlength="120" autocomplete="name" /></label>
+            <label class="tool-f"><span class="tool-lab">Phone</span><input class="field" name="phone" type="tel" maxlength="30" autocomplete="tel" /></label>
+          </div>
+          <label class="tool-f"><span class="tool-lab">Email <small>(optional — we will send a calendar copy)</small></span><input class="field" name="email" type="email" maxlength="160" autocomplete="email" /></label>
+          <label class="tool-f"><span class="tool-lab">Anything we should know? <small>(optional)</small></span><textarea class="field" name="note" rows="3" maxlength="800"></textarea></label>
+          <button type="submit" class="btn" id="bk-submit">Request this appointment</button>
+          <p class="tool-note" id="bk-msg" role="status"></p>
+        </form>
+      </div>
+
+      <aside class="tool-card tool-out bk-side" aria-live="polite">
+        <div id="bk-summary"></div>
+        <div class="bk-done" id="bk-done" hidden></div>
+        <p class="tool-note" style="margin-top:1.4rem">Need help right now? Call <a class="link" href="tel:+914066462292">040-66462292</a> (Hyderabad) or <a class="link" href="tel:+918662975292">0866-2975292</a> (Vijayawada).</p>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { availableDays, slotsOn, fmtDay, fmtTime, weekday } from '../data/booking';
+  const root = document.getElementById('bk')!;
+  const topics: string[] = JSON.parse(root.dataset.topics!);
+  const modes: { id: string; label: string }[] = JSON.parse(root.dataset.modes!);
+  const state = { topic: topics[topics.length - 1], mode: 'phone', date: '', time: '' };
+  const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+  const $ = (id: string) => document.getElementById(id)!;
+  const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  $('bk-topics').innerHTML = topics.map((t) => `<label><input type="radio" name="topic" value="${esc(t)}" ${t === state.topic ? 'checked' : ''}/><span>${esc(t)}</span></label>`).join('');
+  $('bk-modes').innerHTML = modes.map((m) => `<label><input type="radio" name="mode" value="${m.id}" ${m.id === state.mode ? 'checked' : ''}/><span>${m.label}</span></label>`).join('');
+
+  const days = availableDays();
+  $('bk-days').innerHTML = days.map((d) => { const [, m, dd] = d.split('-').map(Number); return `<button type="button" class="bk-day" data-d="${d}"><small>${WD[weekday(d)]}</small><b>${dd}</b><small>${MON[m - 1]}</small></button>`; }).join('');
+
+  function times() {
+    if (!state.date) { $('bk-times').innerHTML = '<p class="tool-note">Choose a day first.</p>'; return; }
+    const s = slotsOn(state.date);
+    $('bk-times').innerHTML = s.length ? s.map((t) => `<button type="button" class="bk-time ${t === state.time ? 'on' : ''}" data-t="${t}">${fmtTime(t)}</button>`).join('') : '<p class="tool-note">No slots left on this day.</p>';
+  }
+  function summary() {
+    const mode = modes.find((m) => m.id === state.mode)!.label;
+    $('bk-summary').innerHTML = `
+      <p class="label">Your appointment</p>
+      <p class="tool-big bk-when">${state.date && state.time ? `${fmtDay(state.date)}<br />${fmtTime(state.time)}` : 'Pick a day and time'}</p>
+      <dl class="tool-dl">
+        <div><dt>Topic</dt><dd>${esc(state.topic)}</dd></div>
+        <div><dt>Meeting</dt><dd>${mode}</dd></div>
+        <div><dt>Duration</dt><dd>30 minutes</dd></div>
+        <div><dt>Time zone</dt><dd>IST (UTC+5:30)</dd></div>
+      </dl>
+      <p class="tool-note">This is a request — our team will confirm it by phone or email.</p>`;
+  }
+
+  $('bk-topics').addEventListener('change', (e) => { state.topic = (e.target as HTMLInputElement).value; summary(); });
+  $('bk-modes').addEventListener('change', (e) => { state.mode = (e.target as HTMLInputElement).value; summary(); });
+  $('bk-days').addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+    state.date = b.dataset.d!; state.time = '';
+    document.querySelectorAll('.bk-day').forEach((x) => x.classList.toggle('on', x === b));
+    times(); summary();
+  });
+  $('bk-times').addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest('button'); if (!b) return;
+    state.time = b.dataset.t!; times(); summary();
+  });
+  // pick the first available day by default
+  if (days.length) (document.querySelector('.bk-day') as HTMLButtonElement).click();
+  summary();
+
+  const form = $('bk-form') as HTMLFormElement;
+  const msg = $('bk-msg');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(form);
+    const name = String(f.get('name') || '').trim(), phone = String(f.get('phone') || '').trim(), email = String(f.get('email') || '').trim();
+    const digits = phone.replace(/\D/g, '');
+    if (!state.date || !state.time) { msg.textContent = 'Please choose a day and a time.'; return; }
+    if (name.length < 2) { msg.textContent = 'Please enter your name.'; return; }
+    if (digits.length < 10 || digits.length > 13) { msg.textContent = 'Please enter a valid mobile number.'; return; }
+    if (email && !/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = 'That email address does not look right.'; return; }
+    msg.textContent = 'Sending your request…';
+    ($('bk-submit') as HTMLButtonElement).disabled = true;
+    try {
+      const res = await fetch('/api/book', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...state, name, phone, email, note: f.get('note'), website: f.get('website') }) });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        const [y, mo, d] = state.date.split('-').map(Number);
+        const [h, mi] = state.time.split(':').map(Number);
+        const pad = (n: number) => String(n).padStart(2, '0');
+        // Convert IST wall-clock to UTC for the "add to Google Calendar" link.
+        const startUtc = new Date(Date.UTC(y, mo - 1, d, h, mi) - 330 * 60000);
+        const endUtc = new Date(startUtc.getTime() + 30 * 60000);
+        const z = (x: Date) => x.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+        const gcal = 'https://calendar.google.com/calendar/render?' + new URLSearchParams({ action: 'TEMPLATE', text: 'Consultation with S.R. Garimella & Co. (to be confirmed)', details: `Topic: ${state.topic}`, dates: `${z(startUtc)}/${z(endUtc)}` });
+        $('bk-summary').hidden = true;
+        const done = $('bk-done'); done.hidden = false;
+        done.innerHTML = `<svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><circle class="c1" cx="32" cy="32" r="28" fill="none" stroke="#16a34a" stroke-width="4"/><path class="c2" d="M19 33l9 9 17-19" fill="none" stroke="#16a34a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h2 class="tool-h2">Request received</h2><p class="tool-big bk-when">${esc(data.when || '')}</p>
+          <p class="tool-note">We will confirm by phone${email ? ' or email' : ''} shortly. ${email ? 'A calendar copy is on its way to your inbox.' : ''}</p>
+          <a class="btn ghost" target="_blank" rel="noopener" href="${gcal}">Add to my Google Calendar</a>`;
+        form.reset(); msg.textContent = '';
+      } else {
+        msg.textContent = res.status === 409 ? data.error : res.status === 503 || data.error === 'send-failed' ? 'Sorry, we could not send your request just now. Please call 040-66462292.' : data.error || 'Something went wrong. Please call 040-66462292.';
+        if (res.status === 409) { times(); }
+      }
+    } catch { msg.textContent = 'Network problem. Please try again or call 040-66462292.'; }
+    ($('bk-submit') as HTMLButtonElement).disabled = false;
+  });
+</script>

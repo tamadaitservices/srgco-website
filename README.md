@@ -9,12 +9,28 @@ Built with [Astro](https://astro.build) (pre-rendered pages + a small Node serve
 - Chat enquiry assistant + WhatsApp button (floating, every page).
 - SEO: per-page titles/descriptions, canonical URLs, JSON-LD, sitemap, robots.txt.
 
+## Maintaining the content features
+
+| Feature | Where | What to keep updated |
+| --- | --- | --- |
+| Tax calculators (`/tools/...`) | `src/lib/tax.ts` | **Slabs, rebate and cess for the new financial year** (after each Union Budget). Then run `npm run check`. Currently set for FY 2025-26. |
+| Compliance calendar | `src/data/compliance.ts` | Due dates when the government extends or changes them. |
+| Notes (`/insights`) | `src/content/notes/*.md` | Add a new `.md` file (copy an existing one's front-matter) and push. Set `draft: true` to hide it. |
+| Health check | `src/data/health.ts` | Questions, tips and the service each one links to. |
+| Booking (`/book`) | `src/data/booking.ts` | Working days, hours, slot length, lead time, meeting modes. |
+| Enquiry types & checklists | `src/data/site.ts` (`enquiryTypes`) | Fields and "documents to keep ready" per service. |
+| Languages (English / Telugu / Hindi) | `src/i18n/dict.ts` | Add a row `[English, Telugu, Hindi]` for any new visible text. Translations are **drafts — have a native speaker review them**. |
+
+### How booking, reminders and enquiries reach the firm
+All forms email the address in `CONTACT_TO` (and `CONTACT_CC`) through the SMTP mailbox. A booking arrives as a **calendar invite** (open it in Gmail/Outlook and accept to add it to the calendar) and the visitor gets a tentative copy if they gave an email. Slots are *requests* — the site does not check live calendar availability. The reminder list signup emails the firm the subscriber's address; sending the reminders themselves is manual (or connect a mailing-list service later).
+
 ## Develop
 ```bash
 npm install
 npm run dev        # http://localhost:4321
 npm run build      # outputs dist/
 npm start          # serves the production build (node dist/server/entry.mjs)
+npm run check      # self-tests for the tax calculators and booking slots
 ```
 Requires Node 22.23.4 or newer (Astro 7).
 

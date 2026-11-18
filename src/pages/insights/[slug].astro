@@ -1,0 +1,38 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { services } from '../../data/site';
+
+export async function getStaticPaths() {
+  const notes = await getCollection('notes', ({ data }) => !data.draft);
+  return notes.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const site = (Astro.site ?? new URL('https://srgco.in')).toString().replace(/\/$/, '');
+const fmt = d.date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+const mins = Math.max(1, Math.round((entry.body ?? '').split(/\s+/).length / 200));
+const service = services.find((s) => s.slug === d.service);
+const ld = [
+  { '@context': 'https://schema.org', '@type': 'Article', headline: d.title, description: d.description, datePublished: d.date.toISOString(), dateModified: d.date.toISOString(),
+    author: { '@type': 'Organization', name: 'S.R. Garimella & Co.' }, publisher: { '@type': 'Organization', name: 'S.R. Garimella & Co.' }, mainEntityOfPage: `${site}/insights/${entry.id}` },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: site + '/' }, { '@type': 'ListItem', position: 2, name: 'Notes', item: site + '/insights' }, { '@type': 'ListItem', position: 3, name: d.title } ] },
+];
+---
+<Base title={d.title} description={d.description} ogType="article" jsonLd={ld}>
+  <article class="mx-auto max-w-3xl px-5 pt-14">
+    <nav class="label" aria-label="Breadcrumb"><a class="link" href="/insights">Notes</a> / {d.category}</nav>
+    <h1 class="mt-3 !text-4xl md:!text-5xl">{d.title}</h1>
+    <p class="label mt-4">{fmt} · {mins} min read</p>
+    <div class="prose"><Content /></div>
+    <div class="tool-disclaimer">
+      <p>This note is general information, not advice for your specific situation. Laws and rules change — please speak to us before acting.</p>
+      <div class="tool-cta">
+        {service && <a class="btn" href={`/services/${service.slug}`}>{service.title}</a>}
+        <a class="btn ghost" href="/book">Book a call</a>
+      </div>
+    </div>
+  </article>
+</Base>

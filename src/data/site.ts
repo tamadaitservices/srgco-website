@@ -329,7 +329,7 @@ export const nav = [
   { href: '/about', label: 'About' },
   { href: '/services', label: 'Services' },
   { href: '/industries', label: 'Industries' },
-  { href: '/team', label: 'Team' },
+  { href: '/tools', label: 'Tools' },
   { href: '/insights', label: 'Notes' },
   { href: '/contact', label: 'Contact' },
 ];

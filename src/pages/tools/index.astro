@@ -1,0 +1,29 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+const tools = [
+  { href: '/tools/income-tax-calculator', icon: 'calculator', title: 'Income tax calculator', text: 'Compare the old and new tax regimes side by side and see which one costs you less.' },
+  { href: '/tools/gst-calculator', icon: 'receipt', title: 'GST calculator', text: 'Add or remove GST from any amount, with the CGST / SGST / IGST split.' },
+  { href: '/tools/hra-calculator', icon: 'building', title: 'HRA exemption calculator', text: 'Work out how much of your house rent allowance is exempt from tax.' },
+  { href: '/tools/tds-calculator', icon: 'stamp', title: 'TDS calculator', text: 'Estimate tax to deduct at source on payments, by section and rate.' },
+  { href: '/compliance-calendar', icon: 'chart', title: 'Compliance calendar', text: 'Upcoming GST, TDS, income tax, payroll and ROC due dates in one place.' },
+  { href: '/health-check', icon: 'shield', title: 'Compliance health check', text: 'Ten quick questions to see how well your business is keeping up.' },
+];
+---
+<Base title="Free Tax & Compliance Tools" description="Free tools from S.R. Garimella & Co.: income tax regime calculator, GST calculator, HRA exemption, TDS calculator, compliance calendar and a compliance health check.">
+  <section class="mx-auto max-w-6xl px-5 pt-14">
+    <p class="label">Free tools</p>
+    <h1 class="mt-2 !text-4xl md:!text-6xl">Tax &amp; compliance tools</h1>
+    <p class="mt-5 max-w-3xl text-xl">Quick, free tools for individuals and businesses. They give indicative answers — for advice on your own situation, talk to our team.</p>
+    <div class="tool-hub">
+      {tools.map((t) => (
+        <a class="tool-tile" href={t.href}>
+          <span class="tool-ico"><Icon name={t.icon} size={28} /></span>
+          <h2>{t.title}</h2>
+          <p>{t.text}</p>
+          <span class="tool-go">Open →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

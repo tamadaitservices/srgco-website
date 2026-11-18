@@ -10,7 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "start": "node dist/server/entry.mjs",
-    "astro": "astro"
+    "astro": "astro",
+    "check": "node --experimental-strip-types --no-warnings src/lib/tax.check.mts && node --experimental-strip-types --no-warnings src/lib/booking.check.mts"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.6",
@@ -18,6 +19,8 @@
     "@astrojs/sitemap": "^3.7.5",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/newsreader": "^5.3.0",
+    "@fontsource-variable/noto-sans-devanagari": "^5.3.0",
+    "@fontsource-variable/noto-sans-telugu": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/instrument-serif": "^5.3.0",
     "@tailwindcss/vite": "^4.3.5",

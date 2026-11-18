@@ -1,0 +1,134 @@
+---
+// Language switch (English / Telugu / Hindi). Translates the page in place using
+// src/i18n/dict.ts; the dictionary is only downloaded when a visitor picks a language.
+---
+<script>
+  type Lang = 'en' | 'te' | 'hi';
+  const KEY = 'srg-lang';
+  const ATTRS = ['placeholder', 'aria-label', 'title', 'alt'];
+  const SKIP = new Set(['SCRIPT', 'STYLE', 'TEXTAREA', 'NOSCRIPT', 'CODE', 'PRE', 'TITLE']);
+  const LABEL: Record<Lang, string> = { en: 'EN', te: 'తె', hi: 'हि' };
+
+  let lang: Lang = 'en';
+  try { const s = localStorage.getItem(KEY); if (s === 'te' || s === 'hi') lang = s; } catch {}
+
+  let exact = new Map<string, [string, string]>();
+  let lower = new Map<string, [string, string]>();
+  let pats: { re: RegExp; row: [string, string] }[] = [];
+  let loaded = false;
+  const origT = new WeakMap<Text, string>(), lastT = new WeakMap<Text, string>();
+  const origA = new WeakMap<Element, Record<string, string>>(), lastA = new WeakMap<Element, Record<string, string>>();
+  const norm = (s: string) => s.replace(/\s+/g, ' ').trim();
+  const col = () => (lang === 'te' ? 0 : 1);
+
+  async function load() {
+    if (loaded) return;
+    const { ROWS } = await import('../i18n/dict');
+    for (const [en, te, hi] of ROWS) {
+      if (/\{\d\}/.test(en)) {
+        const re = new RegExp('^' + en.replace(/[.*+?^$()|[\]\\]/g, '\\$&').replace(/\{\d\}/g, '(.+?)') + '$');
+        pats.push({ re, row: [te, hi] });
+      } else { exact.set(norm(en), [te, hi]); lower.set(norm(en).toLowerCase(), [te, hi]); }
+    }
+    loaded = true;
+  }
+
+  function lookup(src: string): string | null {
+    const e = exact.get(src) ?? lower.get(src.toLowerCase());
+    if (e) return e[col()];
+    for (const p of pats) {
+      const m = src.match(p.re);
+      if (m) { let out = p.row[col()]; m.slice(1).forEach((g, i) => (out = out.replace(`{${i + 1}}`, lookup(norm(g)) ?? g))); return out; }
+    }
+    return null;
+  }
+
+  function text(node: Text) {
+    const p = node.parentElement;
+    if (!p || SKIP.has(p.tagName)) return;
+    const cur = node.nodeValue || '';
+    let o = origT.get(node);
+    if (o === undefined || (lastT.has(node) && lastT.get(node) !== cur)) { o = cur; origT.set(node, o); }
+    const t = norm(o);
+    if (!t || !/[A-Za-z]/.test(t)) return;
+    const tr = lookup(t);
+    if (!tr) return;
+    const v = (o.match(/^\s*/) as RegExpMatchArray)[0] + tr + (o.match(/\s*$/) as RegExpMatchArray)[0];
+    if (cur !== v) node.nodeValue = v;
+    lastT.set(node, v);
+  }
+
+  function attrs(el: Element) {
+    for (const a of ATTRS) {
+      if (!el.hasAttribute(a)) continue;
+      const cur = el.getAttribute(a) || '';
+      const orig = origA.get(el) ?? {}, last = lastA.get(el) ?? {};
+      if (orig[a] === undefined || (last[a] !== undefined && last[a] !== cur)) orig[a] = cur;
+      origA.set(el, orig);
+      const t = norm(orig[a]);
+      const tr = t ? lookup(t) : null;
+      if (!tr) continue;
+      if (cur !== tr) el.setAttribute(a, tr);
+      last[a] = tr; lastA.set(el, last);
+    }
+  }
+
+  function walk(root: Node) {
+    if (root.nodeType === 3) { text(root as Text); return; }
+    if (root.nodeType !== 1) return;
+    const el = root as Element;
+    if (SKIP.has(el.tagName)) return;
+    attrs(el);
+    el.querySelectorAll('[placeholder],[aria-label],[title],[alt]').forEach(attrs);
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    let n: Node | null;
+    while ((n = w.nextNode())) text(n as Text);
+  }
+
+  let observer: MutationObserver | null = null;
+  function observe() {
+    if (observer) return;
+    observer = new MutationObserver((muts) => {
+      if (lang === 'en') return;
+      for (const m of muts) {
+        if (m.type === 'childList') m.addedNodes.forEach(walk);
+        else if (m.type === 'characterData') text(m.target as Text);
+        else if (m.type === 'attributes') attrs(m.target as Element);
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+  }
+
+  function ui() {
+    document.documentElement.lang = lang;
+    document.documentElement.dataset.lang = lang;
+    document.querySelectorAll<HTMLButtonElement>('[data-lang]').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.lang === lang)));
+    const cur = document.getElementById('lang-cur');
+    if (cur) cur.textContent = LABEL[lang];
+  }
+
+  async function apply() {
+    ui();
+    if (lang === 'en') return;
+    await load();
+    walk(document.body);
+    observe();
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-lang]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const next = b.dataset.lang as Lang;
+      (document.getElementById('lang-pop') as HTMLDetailsElement | null)?.removeAttribute('open');
+      if (next === lang) return;
+      try { localStorage.setItem(KEY, next); } catch {}
+      if (next === 'en') { location.reload(); return; } // simplest way to restore the original English everywhere
+      lang = next;
+      apply();
+    }),
+  );
+  document.addEventListener('click', (e) => {
+    const pop = document.getElementById('lang-pop') as HTMLDetailsElement | null;
+    if (pop?.open && !pop.contains(e.target as Node)) pop.open = false;
+  });
+  apply();
+</script>

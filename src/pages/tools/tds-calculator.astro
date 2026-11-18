@@ -1,0 +1,51 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { TDS_PRESETS } from '../../lib/tax';
+---
+<ToolLayout
+  title="TDS Calculator — Tax Deducted at Source"
+  description="Estimate TDS on payments such as contractor, professional fees, rent, commission and interest. Choose the section or enter your own rate."
+  h1="TDS calculator"
+  intro="Pick the type of payment, enter the amount, and see the TDS to deduct and the net amount to pay."
+>
+  <div class="tool-grid">
+    <form id="td-form" class="tool-card" onsubmit="return false" novalidate>
+      <label class="tool-f"><span class="tool-lab">Type of payment</span>
+        <select class="field" id="td-sec">
+          {TDS_PRESETS.map((p) => <option value={p.id} data-rate={p.rate}>{p.label}</option>)}
+        </select>
+      </label>
+      <label class="tool-f"><span class="tool-lab">Payment amount (₹)</span><input class="field" id="td-amount" inputmode="numeric" value="1,00,000" autocomplete="off" /></label>
+      <label class="tool-f"><span class="tool-lab">TDS rate (%)</span><input class="field" id="td-rate" inputmode="decimal" value="1" autocomplete="off" /></label>
+      <label class="tool-check"><input type="checkbox" id="td-pan" checked /> <span>Payee has given a valid PAN</span></label>
+      <p class="tool-note">Rates are indicative and are editable — check the current rate and threshold for the section before deducting. Without a PAN, a higher rate (at least 20%) applies.</p>
+    </form>
+    <div class="tool-card tool-out" id="td-out" aria-live="polite"></div>
+  </div>
+</ToolLayout>
+
+<script>
+  import { computeTds } from '../../lib/tax';
+  import { inr, num, bindInr } from '../../lib/ui';
+  const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+  const sec = document.getElementById('td-sec') as HTMLSelectElement;
+  const out = document.getElementById('td-out')!;
+  function calc() {
+    const r = computeTds(num($('td-amount')), Number($('td-rate').value) || 0, $('td-pan').checked);
+    out.innerHTML = `
+      <p class="label">Result</p>
+      <p class="tool-big">${inr(r.tds)}</p>
+      <p class="tool-sub">TDS to deduct at ${r.rate}%${!$('td-pan').checked ? ' (no-PAN rate applied)' : ''}</p>
+      <dl class="tool-dl">
+        <div><dt>Payment amount</dt><dd>${inr(num($('td-amount')))}</dd></div>
+        <div><dt>TDS deducted (${r.rate}%)</dt><dd>− ${inr(r.tds)}</dd></div>
+        <div class="sum"><dt>Net amount payable to the payee</dt><dd>${inr(r.net)}</dd></div>
+      </dl>
+      <p class="tool-note">TDS is generally deposited by the 7th of the following month.</p>`;
+  }
+  sec.addEventListener('change', () => { $('td-rate').value = String(sec.selectedOptions[0].dataset.rate); calc(); });
+  bindInr($('td-amount'), calc);
+  $('td-rate').addEventListener('input', calc);
+  $('td-pan').addEventListener('change', calc);
+  calc();
+</script>

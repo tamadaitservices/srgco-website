@@ -1,0 +1,25 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+const mins = (body: string) => Math.max(1, Math.round((body || '').split(/\s+/).length / 200));
+---
+<Base title="Notes — Tax, GST, Audit & Compliance Insights" description="Short, practical notes on income tax, GST, audit and compliance from S.R. Garimella & Co., Chartered Accountants in Hyderabad and Vijayawada.">
+  <section class="mx-auto max-w-5xl px-5 pt-14">
+    <p class="label">Notes</p>
+    <h1 class="mt-2 !text-4xl md:!text-6xl">Notes from our desk</h1>
+    <p class="mt-5 max-w-3xl text-xl">Short, practical notes on tax, audit and compliance. Not a feed — written when there is something worth saying.</p>
+    <div class="notes-list">
+      {notes.map((n) => (
+        <a class="note-card" href={`/insights/${n.id}`}>
+          <p class="label">{n.data.category} · {fmt(n.data.date)} · {mins(n.body ?? '')} min read</p>
+          <h2>{n.data.title}</h2>
+          <p>{n.data.description}</p>
+          <span class="note-go">Read note →</span>
+        </a>
+      ))}
+    </div>
+    <p class="tool-note" style="margin-top:2rem">Subscribe to our <a class="link" href="/rss.xml">RSS feed</a> or <a class="link" href="/compliance-calendar">join the compliance reminder list</a>.</p>
+  </section>
+</Base>

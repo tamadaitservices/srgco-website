@@ -1,0 +1,109 @@
+---
+import ToolLayout from '../layouts/ToolLayout.astro';
+import { HEALTH_QUESTIONS, OPTIONS } from '../data/health';
+import { services } from '../data/site';
+const svc = Object.fromEntries(services.map((s) => [s.slug, s.title]));
+---
+<ToolLayout
+  title="Business Compliance Health Check — Free 2-Minute Self-Assessment"
+  description="Answer ten quick questions on GST, TDS, accounts, audit, income tax, payroll and company-law filings to see how healthy your compliance is, and what to fix first."
+  h1="Compliance health check"
+  intro="Ten quick questions on GST, TDS, accounts, audit, income tax, payroll and company filings. About two minutes — and you get a score with practical next steps."
+>
+  <div class="hc-wrap tool-card" id="hc" data-q={JSON.stringify(HEALTH_QUESTIONS)} data-opts={JSON.stringify(OPTIONS)} data-svc={JSON.stringify(svc)}>
+    <div id="hc-body" aria-live="polite"></div>
+  </div>
+</ToolLayout>
+
+<script>
+  type Q = { id: string; area: string; q: string; hint: string; service: string; fix: string };
+  type Opt = { label: string; score: number | null };
+  const root = document.getElementById('hc')!;
+  const body = document.getElementById('hc-body')!;
+  const Qs: Q[] = JSON.parse(root.dataset.q!);
+  const Opts: Opt[] = JSON.parse(root.dataset.opts!);
+  const svc: Record<string, string> = JSON.parse(root.dataset.svc!);
+  const bandOf = (pct: number) => (pct >= 80 ? { name: 'Strong', tone: 'good', text: 'You are keeping up well. A periodic review will help you stay ahead of changes.' } : pct >= 50 ? { name: 'Needs attention', tone: 'mid', text: 'Some areas are slipping. Fixing them now is much cheaper than fixing penalties and notices later.' } : { name: 'At risk', tone: 'low', text: 'Several areas need prompt attention. A structured review would help you get back on track.' });
+  const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+
+  let i = 0;
+  const answers: (number | null | undefined)[] = [];
+
+  function question() {
+    const q = Qs[i];
+    const pctDone = Math.round((i / Qs.length) * 100);
+    body.innerHTML = `
+      <div class="hc-progress"><span>Question ${i + 1} of ${Qs.length}</span><div class="hc-bar"><i style="width:${pctDone}%"></i></div></div>
+      <p class="cal-tag" style="margin-top:1.6rem">${esc(q.area)}</p>
+      <h2 class="hc-q">${esc(q.q)}</h2>
+      <p class="tool-note">${esc(q.hint)}</p>
+      <div class="hc-opts">${Opts.map((o, k) => `<button type="button" class="hc-opt ${answers[i] === o.score && answers[i] !== undefined ? 'on' : ''}" data-k="${k}">${o.label}</button>`).join('')}</div>
+      <div class="hc-nav">${i > 0 ? '<button type="button" class="btn ghost" id="hc-back">← Back</button>' : '<span></span>'}</div>`;
+    body.querySelectorAll<HTMLButtonElement>('.hc-opt').forEach((b) =>
+      b.addEventListener('click', () => {
+        answers[i] = Opts[Number(b.dataset.k)].score;
+        b.classList.add('on');
+        setTimeout(() => { i++; i < Qs.length ? question() : result(); }, 180);
+      }),
+    );
+    document.getElementById('hc-back')?.addEventListener('click', () => { i--; question(); });
+  }
+
+  function result() {
+    let got = 0, max = 0;
+    const weak: Q[] = [];
+    Qs.forEach((q, k) => {
+      const a = answers[k];
+      if (a === null || a === undefined) return;
+      got += a; max += 2;
+      if (a <= 1) weak.push(q);
+    });
+    const pct = max ? Math.round((got / max) * 100) : 100;
+    const b = bandOf(pct);
+    const C = 2 * Math.PI * 54;
+    body.innerHTML = `
+      <div class="hc-result">
+        <div class="hc-ring ${b.tone}"><svg viewBox="0 0 128 128" width="168" height="168" aria-hidden="true"><circle cx="64" cy="64" r="54" class="bg"/><circle cx="64" cy="64" r="54" class="fg" stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 64 64)"/></svg><div><b>${pct}%</b><span>${b.name}</span></div></div>
+        <div class="hc-sum"><p class="label">Your result</p><h2 class="hc-q">${b.name}</h2><p>${b.text}</p><p class="tool-note">This is a quick self-assessment based on your answers, not an audit or legal advice.</p></div>
+      </div>
+      ${weak.length ? `<h3 class="hc-h3">Areas to work on</h3><div class="hc-weak">${weak.map((q) => `<div class="hc-w"><p class="cal-tag">${esc(q.area)}</p><p class="hc-wq">${esc(q.q)}</p><p>${esc(q.fix)}</p><a class="link" href="/services/${q.service}">${esc(svc[q.service] || 'Our services')} →</a></div>`).join('')}</div>` : '<p class="tool-verdict">No weak areas found — well done.</p>'}
+      <div class="hc-lead">
+        <h3 class="hc-h3">Want a CA to review this with you?</h3>
+        <p class="tool-note">Leave your details and our team will call you back with a short, no-obligation review.</p>
+        <form id="hc-form" novalidate>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="cl-hp" aria-hidden="true" />
+          <div class="tool-two">
+            <label class="tool-f"><span class="tool-lab">Your name</span><input class="field" name="name" maxlength="120" autocomplete="name" /></label>
+            <label class="tool-f"><span class="tool-lab">Phone</span><input class="field" name="phone" type="tel" maxlength="30" autocomplete="tel" /></label>
+          </div>
+          <label class="tool-f"><span class="tool-lab">Email <small>(optional)</small></span><input class="field" name="email" type="email" maxlength="160" autocomplete="email" /></label>
+          <div class="tool-cta"><button type="submit" class="btn">Request a review</button><button type="button" class="btn ghost" id="hc-again">Retake the check</button></div>
+          <p class="tool-note" id="hc-msg" role="status"></p>
+        </form>
+      </div>`;
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const fg = body.querySelector<SVGCircleElement>('.fg');
+      if (fg) fg.style.strokeDashoffset = String(C * (1 - pct / 100));
+    }));
+    document.getElementById('hc-again')!.addEventListener('click', () => { i = 0; answers.length = 0; question(); });
+    const form = document.getElementById('hc-form') as HTMLFormElement;
+    const msg = document.getElementById('hc-msg')!;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = new FormData(form);
+      const name = String(f.get('name') || '').trim(), phone = String(f.get('phone') || '').trim(), email = String(f.get('email') || '').trim();
+      const digits = phone.replace(/\D/g, '');
+      if (name.length < 2) { msg.textContent = 'Please enter your name.'; return; }
+      if (digits.length < 10 || digits.length > 13) { msg.textContent = 'Please enter a valid mobile number.'; return; }
+      if (email && !/^\S+@\S+\.\S+$/.test(email)) { msg.textContent = 'That email address does not look right.'; return; }
+      msg.textContent = 'Sending…';
+      const summary = `Compliance health check: ${pct}% (${b.name}). ` + (weak.length ? 'Areas to review: ' + weak.map((q) => q.area).join(', ') + '.' : 'No weak areas.');
+      try {
+        const res = await fetch('/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: 'Compliance health check', name, phone, email, message: summary, page: '/health-check', website: f.get('website') }) });
+        msg.textContent = res.ok ? 'Thank you — our team will call you shortly.' : 'Sorry, we could not send that just now. Please call 040-66462292.';
+        if (res.ok) form.reset();
+      } catch { msg.textContent = 'Network problem. Please try again.'; }
+    });
+  }
+  question();
+</script>

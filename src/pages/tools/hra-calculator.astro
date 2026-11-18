@@ -1,0 +1,52 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+---
+<ToolLayout
+  title="HRA Exemption Calculator — House Rent Allowance"
+  description="Calculate how much of your house rent allowance (HRA) is exempt from income tax, using the least-of-three rule."
+  h1="HRA exemption calculator"
+  intro="Your HRA exemption is the lowest of three amounts. Enter your monthly figures to see the exempt and taxable parts."
+>
+  <div class="tool-grid">
+    <form id="hr-form" class="tool-card" onsubmit="return false" novalidate>
+      <label class="tool-f"><span class="tool-lab">Basic salary + DA, per month (₹)</span><input class="field" id="hr-basic" inputmode="numeric" value="50,000" autocomplete="off" /></label>
+      <label class="tool-f"><span class="tool-lab">HRA received, per month (₹)</span><input class="field" id="hr-hra" inputmode="numeric" value="20,000" autocomplete="off" /></label>
+      <label class="tool-f"><span class="tool-lab">Rent paid, per month (₹)</span><input class="field" id="hr-rent" inputmode="numeric" value="25,000" autocomplete="off" /></label>
+      <fieldset class="seg-wrap"><legend class="tool-lab">City you live in</legend>
+        <div class="seg">
+          <label><input type="radio" name="metro" value="1" /><span>Metro (50% of salary)</span></label>
+          <label><input type="radio" name="metro" value="0" checked /><span>Non-metro (40% of salary)</span></label>
+        </div>
+      </fieldset>
+      <p class="tool-note">Which cities count as “metro” is set by the income tax rules and can change — please check the current list. HRA exemption applies under the old tax regime.</p>
+    </form>
+    <div class="tool-card tool-out" id="hr-out" aria-live="polite"></div>
+  </div>
+</ToolLayout>
+
+<script>
+  import { computeHra } from '../../lib/tax';
+  import { inr, num, bindInr } from '../../lib/ui';
+  const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+  const out = document.getElementById('hr-out')!;
+  function calc() {
+    const metro = (document.querySelector('input[name=metro]:checked') as HTMLInputElement).value === '1';
+    const m = (id: string) => num($(id)) * 12;
+    const r = computeHra(m('hr-basic'), m('hr-hra'), m('hr-rent'), metro);
+    const row = (label: string, v: number, hit: boolean) => `<div class="${hit ? 'hit' : ''}"><dt>${label}</dt><dd>${inr(v)} / yr</dd></div>`;
+    out.innerHTML = `
+      <p class="label">Result</p>
+      <p class="tool-big">${inr(r.exemption)}</p>
+      <p class="tool-sub">HRA exempt per year · ${inr(r.exemption / 12)} per month</p>
+      <p class="tool-label-sm">The least of these three (highlighted):</p>
+      <dl class="tool-dl">
+        ${row('1. HRA actually received', r.received, r.limiting === 'HRA actually received')}
+        ${row('2. Rent paid minus 10% of salary', r.rentMinus10, r.limiting === 'Rent paid minus 10% of salary')}
+        ${row(`3. ${metro ? '50' : '40'}% of salary`, r.percentOfSalary, r.limiting.endsWith('of salary') && !r.limiting.startsWith('Rent'))}
+        <div class="sum"><dt>Taxable HRA</dt><dd>${inr(r.taxable)} / yr</dd></div>
+      </dl>`;
+  }
+  ['hr-basic', 'hr-hra', 'hr-rent'].forEach((i) => bindInr($(i), calc));
+  document.getElementById('hr-form')!.addEventListener('change', calc);
+  calc();
+</script>

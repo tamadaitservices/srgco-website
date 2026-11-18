@@ -1,0 +1,89 @@
+---
+import ToolLayout from '../../layouts/ToolLayout.astro';
+import { TAX_META } from '../../lib/tax';
+---
+<ToolLayout
+  title="Income Tax Calculator — Old vs New Regime"
+  description={`Compare income tax under the old and new regimes for FY ${TAX_META.fy} (AY ${TAX_META.ay}). Enter income and deductions to see which regime saves you more.`}
+  h1="Income tax calculator: old vs new regime"
+  intro="Enter your income and deductions. We show the tax under both regimes side by side and tell you which is lower."
+  rates
+>
+  <div class="tool-grid">
+    <form id="tx-form" class="tool-card" onsubmit="return false" novalidate>
+      <p class="label">About you</p>
+      <fieldset class="seg-wrap"><legend class="tool-lab">Age</legend>
+        <div class="seg">
+          <label><input type="radio" name="age" value="general" checked /><span>Below 60</span></label>
+          <label><input type="radio" name="age" value="senior" /><span>60 – 79</span></label>
+          <label><input type="radio" name="age" value="super" /><span>80 or above</span></label>
+        </div>
+      </fieldset>
+      <label class="tool-check"><input type="checkbox" id="tx-salaried" checked /> <span>I am a salaried person (standard deduction applies)</span></label>
+      <label class="tool-f"><span class="tool-lab">Annual income (₹)</span><input class="field" id="tx-income" inputmode="numeric" value="12,00,000" autocomplete="off" /></label>
+
+      <p class="label tool-gap">Deductions <em>(old regime only)</em></p>
+      <div class="tool-two">
+        <label class="tool-f"><span class="tool-lab">80C – PF, PPF, LIC, ELSS… <small>max ₹1,50,000</small></span><input class="field" id="tx-80c" inputmode="numeric" value="1,50,000" autocomplete="off" /></label>
+        <label class="tool-f"><span class="tool-lab">80D – health insurance <small>max ₹1,00,000</small></span><input class="field" id="tx-80d" inputmode="numeric" value="" placeholder="0" autocomplete="off" /></label>
+        <label class="tool-f"><span class="tool-lab">NPS – 80CCD(1B) <small>max ₹50,000</small></span><input class="field" id="tx-nps" inputmode="numeric" value="" placeholder="0" autocomplete="off" /></label>
+        <label class="tool-f"><span class="tool-lab">Home loan interest <small>max ₹2,00,000</small></span><input class="field" id="tx-home" inputmode="numeric" value="" placeholder="0" autocomplete="off" /></label>
+        <label class="tool-f"><span class="tool-lab">HRA exemption <small><a class="link" href="/tools/hra-calculator">calculate it</a></small></span><input class="field" id="tx-hra" inputmode="numeric" value="" placeholder="0" autocomplete="off" /></label>
+        <label class="tool-f"><span class="tool-lab">Other deductions</span><input class="field" id="tx-other" inputmode="numeric" value="" placeholder="0" autocomplete="off" /></label>
+      </div>
+    </form>
+    <div class="tool-card tool-out" id="tx-out" aria-live="polite"></div>
+  </div>
+</ToolLayout>
+
+<script>
+  import { computeNew, computeOld, type AgeBand, type RegimeResult } from '../../lib/tax';
+  import { inr, pct, num, bindInr } from '../../lib/ui';
+  const $ = (id: string) => document.getElementById(id) as HTMLInputElement;
+  const ids = ['tx-income', 'tx-80c', 'tx-80d', 'tx-nps', 'tx-home', 'tx-hra', 'tx-other'];
+  const out = document.getElementById('tx-out')!;
+
+  const card = (name: string, r: RegimeResult, best: boolean) => `
+    <div class="tool-res ${best ? 'best' : ''}">
+      ${best ? '<span class="tool-badge">Lower tax</span>' : ''}
+      <p class="label">${name}</p>
+      <p class="tool-big">${inr(r.total)}</p>
+      <p class="tool-sub">Total tax payable · effective rate ${pct(r.effectiveRate)}</p>
+      <dl class="tool-dl">
+        <div><dt>Taxable income</dt><dd>${inr(r.taxable)}</dd></div>
+        <div><dt>Tax on slabs</dt><dd>${inr(r.slabTax)}</dd></div>
+        <div><dt>Rebate / relief</dt><dd>− ${inr(r.rebate)}</dd></div>
+        ${r.surcharge > 0 ? `<div><dt>Surcharge</dt><dd>${inr(r.surcharge)}</dd></div>` : ''}
+        <div><dt>Health &amp; education cess (4%)</dt><dd>${inr(r.cess)}</dd></div>
+      </dl>
+    </div>`;
+
+  const rows = (r: RegimeResult) =>
+    r.rows.map((x) => `<tr><td>${inr(x.from)} – ${x.to === Infinity ? 'above' : inr(x.to)}</td><td>${(x.rate * 100).toFixed(0)}%</td><td>${inr(x.amount)}</td><td>${inr(x.tax)}</td></tr>`).join('');
+
+  function calc() {
+    const age = (document.querySelector('input[name=age]:checked') as HTMLInputElement).value as AgeBand;
+    const input = {
+      income: num($('tx-income')), age, salaried: $('tx-salaried').checked,
+      d80c: num($('tx-80c')), d80d: num($('tx-80d')), nps: num($('tx-nps')), homeLoan: num($('tx-home')), hra: num($('tx-hra')), other: num($('tx-other')),
+    };
+    const n = computeNew(input), o = computeOld(input);
+    const diff = Math.abs(n.total - o.total);
+    const newBest = n.total <= o.total;
+    const verdict = diff < 1 ? 'Both regimes give the same tax.' : `${newBest ? 'New' : 'Old'} regime saves you <strong>${inr(diff)}</strong>${input.income ? ` (${pct(diff / input.income)} of income)` : ''}.`;
+    out.innerHTML = `
+      <p class="label">Result</p>
+      <p class="tool-verdict">${verdict}</p>
+      <div class="tool-res-grid">${card('New regime', n, newBest && diff >= 1)}${card('Old regime', o, !newBest && diff >= 1)}</div>
+      ${n.note || o.note ? `<p class="tool-note">${n.note || o.note}</p>` : ''}
+      <details class="tool-more"><summary>See the slab-wise working</summary>
+        <p class="label">New regime</p>
+        <table class="ltable tool-tbl"><thead><tr><th>Slab</th><th>Rate</th><th>Income in slab</th><th>Tax</th></tr></thead><tbody>${rows(n) || '<tr><td colspan="4">No taxable income</td></tr>'}</tbody></table>
+        <p class="label tool-gap">Old regime</p>
+        <table class="ltable tool-tbl"><thead><tr><th>Slab</th><th>Rate</th><th>Income in slab</th><th>Tax</th></tr></thead><tbody>${rows(o) || '<tr><td colspan="4">No taxable income</td></tr>'}</tbody></table>
+      </details>`;
+  }
+  ids.forEach((i) => bindInr($(i), calc));
+  document.getElementById('tx-form')!.addEventListener('change', calc);
+  calc();
+</script>

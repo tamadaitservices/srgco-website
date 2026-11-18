@@ -27,18 +27,26 @@ const themes = [
     </nav>
 
     <div class="flex items-center gap-2 sm:gap-3">
-    <a href="/contact" class="nv-pill">Schedule a consultation <span aria-hidden="true">→</span></a>
+    <a href="/book" class="nv-pill">Schedule a consultation <span aria-hidden="true">→</span></a>
     <div class="theme-switch hidden sm:inline-flex" role="radiogroup" aria-label="Colour theme" id="theme-switch">
       {themes.map((t) => (
         <button type="button" role="radio" aria-checked="false" data-theme-choice={t.id} title={t.title}><span class={`dot ${t.dot}`}></span><span class="hidden 2xl:inline">{t.label}</span></button>
       ))}
     </div>
     <details class="theme-pop relative sm:hidden" id="theme-pop">
-      <summary class="theme-pop-btn" aria-label="Change colour theme"><span class="dot" id="theme-pop-dot"></span><span class="label !text-[0.62rem] !text-pen">Theme</span></summary>
+      <summary class="theme-pop-btn" aria-label="Change colour theme"><span class="dot" id="theme-pop-dot"></span><span class="theme-lab label !text-[0.62rem] !text-pen">Theme</span></summary>
       <div class="theme-pop-menu" role="radiogroup" aria-label="Colour theme">
         {themes.map((t) => (
           <button type="button" role="radio" aria-checked="false" data-theme-choice={t.id}><span class={`dot ${t.dot}`}></span><span>{t.label}</span></button>
         ))}
+      </div>
+    </details>
+    <details class="lang-pop relative" id="lang-pop">
+      <summary class="theme-pop-btn" aria-label="Language"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg><span class="label !text-[0.68rem] !text-pen" id="lang-cur">EN</span></summary>
+      <div class="theme-pop-menu" role="radiogroup" aria-label="Language">
+        <button type="button" role="radio" aria-checked="true" data-lang="en"><span>English</span></button>
+        <button type="button" role="radio" aria-checked="false" data-lang="te"><span>తెలుగు</span></button>
+        <button type="button" role="radio" aria-checked="false" data-lang="hi"><span>हिन्दी</span></button>
       </div>
     </details>
     <details class="relative lg:hidden">

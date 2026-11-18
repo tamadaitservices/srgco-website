@@ -19,7 +19,20 @@ export function mailConfigured() {
   return Boolean(SMTP_HOST && SMTP_USER && SMTP_PASS && CONTACT_TO);
 }
 
-export async function sendMail(opts: { subject: string; text: string; replyTo?: string }) {
+export interface MailOptions {
+  subject: string;
+  text: string;
+  html?: string;
+  replyTo?: string;
+  /** Send to this address instead of the firm's CONTACT_TO (e.g. a confirmation to the visitor). */
+  to?: string;
+  /** Also copy CONTACT_CC. Defaults to true for mail sent to the firm. */
+  cc?: boolean;
+  /** A calendar invite, shown by Gmail/Outlook as an event with an "Add to calendar" button. */
+  icalEvent?: { method: string; content: string; filename?: string };
+}
+
+export async function sendMail(opts: MailOptions) {
   const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, CONTACT_TO } = process.env;
   const port = Number(SMTP_PORT) || 465;
   const transport = nodemailer.createTransport({
@@ -28,12 +41,15 @@ export async function sendMail(opts: { subject: string; text: string; replyTo?: 
     secure: port === 465,
     auth: { user: SMTP_USER, pass: SMTP_PASS },
   });
+  const toFirm = !opts.to;
   await transport.sendMail({
-    from: `"SRG Website" <${SMTP_USER}>`,
-    to: CONTACT_TO,
-    cc: process.env.CONTACT_CC || undefined,
+    from: `"S.R. Garimella & Co." <${SMTP_USER}>`,
+    to: opts.to || CONTACT_TO,
+    cc: toFirm && opts.cc !== false ? process.env.CONTACT_CC || undefined : undefined,
     replyTo: opts.replyTo,
     subject: opts.subject,
     text: opts.text,
+    html: opts.html,
+    icalEvent: opts.icalEvent,
   });
 }
