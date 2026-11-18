@@ -29,3 +29,6 @@ pnpm-debug.log*
 
 # deploy bundles
 *.zip
+
+# local deploy helpers (never commit)
+*.env

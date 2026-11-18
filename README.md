@@ -25,8 +25,8 @@ Requires Node 22.23.4 or newer (Astro 7).
 | Node version | 24.x (or 22.x, must be >= 22.23.4) |
 | Install command | `npm install` |
 | Build command | `npm run build` |
-| Start command | `npm start` (runs `node dist/server/entry.mjs`) |
-| Entry file | `dist/server/entry.mjs` |
+| Output directory | `dist` |
+| Entry file | `server/entry.mjs` (**relative to the output directory** — `dist/server/entry.mjs` makes Hostinger fail with "Entry file not found") |
 
 Set `HOST=0.0.0.0` if Hostinger does not provide it; Hostinger supplies `PORT`.
 
