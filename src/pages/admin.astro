@@ -349,11 +349,15 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       { id: 'light', name: 'Ledger', note: 'Paper and pen', bg: '#faf8f2', fg: '#2d3b50', ac: '#b5483a' },
       { id: 'dark', name: 'Night', note: 'Dark mode', bg: '#14171f', fg: '#e9e6df', ac: '#7fb0ff' },
       { id: 'emerald', name: 'Emerald & Gold', note: 'Rich green', bg: '#0b3d2e', fg: '#f4efd8', ac: '#d4af37' },
+      { id: 'republic', name: 'Republic Day', note: '26 January · navy with tricolour', bg: '#0b1f7a', fg: '#ffffff', ac: '#ff9933' },
+      { id: 'independence', name: 'Independence Day', note: '15 August · green and saffron', bg: '#07560d', fg: '#ffffff', ac: '#ff9933' },
+      { id: 'gandhi', name: 'Gandhi Jayanti', note: '2 October · khadi cream and earth tones', bg: '#fbf7ee', fg: '#3a3326', ac: '#8a5a1b' },
     ];
-    let cfg = { enabled: THEMES.map((t) => t.id), defaultTheme: 'navy' };
+    let cfg = { enabled: THEMES.map((t) => t.id), defaultTheme: 'navy', occasions: true };
     const tbox = $('#theme-fields')!;
     function renderThemes() {
-      tbox.innerHTML = THEMES.map((t, n) => {
+      const occ = `<div class="ad-occ"><div><b>Festival auto-switch</b><span>On 26 January, 15 August and 2 October (Indian time), new visitors automatically see that day's festival theme. Visitors who picked a theme themselves keep theirs.</span></div><label class="ad-sw"><input type="checkbox" data-occ ${cfg.occasions ? 'checked' : ''} aria-label="Festival auto-switch" /><span></span></label></div>`;
+      tbox.innerHTML = occ + THEMES.map((t, n) => {
         const on = cfg.enabled.includes(t.id), def = cfg.defaultTheme === t.id;
         return `<div class="ad-theme ${on ? '' : 'off'} ${def ? 'def' : ''}" data-id="${t.id}" style="animation-delay:${n * 60}ms">
           <div class="ad-prev" style="background:${t.bg}"><div class="ad-pnav"><i style="background:${t.fg}"></i><i style="background:${t.fg}"></i><i style="background:${t.fg}"></i><u style="background:${t.ac}"></u></div>
@@ -368,7 +372,9 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       }).join('');
     }
     tbox.addEventListener('change', (e) => {
-      const el = e.target as HTMLInputElement; if (!el.matches('[data-en]')) return;
+      const el = e.target as HTMLInputElement;
+      if (el.matches('[data-occ]')) { cfg.occasions = el.checked; setDirty(true); return; }
+      if (!el.matches('[data-en]')) return;
       const id = el.closest<HTMLElement>('.ad-theme')!.dataset.id!;
       if (!el.checked && cfg.enabled.length === 1) { el.checked = true; return note('At least one theme must stay enabled.', 'err'); }
       cfg.enabled = el.checked ? THEMES.map((t) => t.id).filter((x) => x === id || cfg.enabled.includes(x)) : cfg.enabled.filter((x) => x !== id);

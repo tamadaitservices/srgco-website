@@ -66,13 +66,17 @@ const ld = [orgLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []
       // Set theme before first paint (no flash). A visitor's saved choice wins if that theme is still enabled;
       // otherwise the default chosen in /admin (Navy & Copper until changed) is used.
       (function () {
-        var ALL = ['clean', 'navy', 'light', 'dark', 'emerald'];
+        var ALL = ['clean', 'navy', 'light', 'dark', 'emerald', 'republic', 'independence', 'gandhi'];
+        // festival of the day, by Indian time: 26 Jan, 15 Aug, 2 Oct
+        function festival() { var n = new Date(Date.now() + 19800000), m = n.getUTCMonth() + 1, d = n.getUTCDate(); return m === 1 && d === 26 ? 'republic' : m === 8 && d === 15 ? 'independence' : m === 10 && d === 2 ? 'gandhi' : null; }
         var root = document.documentElement;
         function cfg() {
           var c = null; try { c = JSON.parse(localStorage.getItem('srg-cfg')); } catch (e) {}
           var en = (c && c.enabled || []).filter(function (x) { return ALL.indexOf(x) > -1; });
           if (!en.length) en = ALL.slice();
           var d = c && en.indexOf(c.def) > -1 ? c.def : en.indexOf('navy') > -1 ? 'navy' : en[0];
+          var f = festival();
+          if (f && (!c || c.occ !== false) && en.indexOf(f) > -1) d = f; // new visitors see the festival theme on its day
           return { enabled: en, def: d };
         }
         function apply() {

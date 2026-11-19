@@ -12,7 +12,7 @@ export const PUT: APIRoute = async ({ request }) => {
   if (!sameOrigin(request)) return json({ error: 'Bad request.' }, 403);
   const body = await request.json().catch(() => null);
   if (!body) return json({ error: 'Invalid data.' }, 400);
-  const s = sanitizeSettings(body);
+  const s = sanitizeSettings({ ...body, v: 2 }); // the form always sends the full list
   try { saveSettings(s); } catch { return json({ error: 'Could not save on the server. Check that DATA_DIR is writable.' }, 500); }
   return json({ ok: true, ...s });
 };

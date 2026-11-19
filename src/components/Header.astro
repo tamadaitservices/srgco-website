@@ -7,8 +7,14 @@ const themes = [
   { id: 'light', label: 'Ledger', title: 'Ledger (light)', dot: 'd-light' },
   { id: 'dark', label: 'Night', title: 'Night (dark)', dot: 'd-dark' },
   { id: 'emerald', label: 'Emerald', title: 'Emerald & gold', dot: 'd-emerald' },
+  { id: 'republic', label: 'Republic Day', title: 'Republic Day (26 January)', dot: 'd-republic' },
+  { id: 'independence', label: 'Independence Day', title: 'Independence Day (15 August)', dot: 'd-independence' },
+  { id: 'gandhi', label: 'Gandhi Jayanti', title: 'Gandhi Jayanti (2 October)', dot: 'd-gandhi' },
 ];
 ---
+<div class="occ-bar occ-republic"><svg viewBox="-30 -30 60 60" aria-hidden="true"><circle r="26" fill="none" stroke="#fff" stroke-width="3"/><circle r="4" fill="#fff"/>{[...Array(12).keys()].map((i) => <line y1="-5" y2="-24" stroke="#fff" stroke-width="2" transform={`rotate(${i * 30})`} />)}</svg><span>Happy Republic Day · 26 January</span></div>
+<div class="occ-bar occ-independence"><svg viewBox="-30 -30 60 60" aria-hidden="true"><circle r="26" fill="none" stroke="#fff" stroke-width="3"/><circle r="4" fill="#fff"/>{[...Array(12).keys()].map((i) => <line y1="-5" y2="-24" stroke="#fff" stroke-width="2" transform={`rotate(${i * 30})`} />)}</svg><span>Happy Independence Day · 15 August</span></div>
+<div class="occ-bar occ-gandhi"><svg viewBox="-30 -30 60 60" aria-hidden="true"><circle r="26" fill="none" stroke="#fff" stroke-width="3"/><circle r="4" fill="#fff"/>{[...Array(12).keys()].map((i) => <line y1="-5" y2="-24" stroke="#fff" stroke-width="2" transform={`rotate(${i * 30})`} />)}</svg><span>Gandhi Jayanti · 2 October · Truth, integrity and simplicity</span></div>
 <header class="site-header sticky top-0 z-30 border-b-[3px] border-double border-ink bg-paper/90 backdrop-blur-md">
   <div class="mx-auto flex max-w-[88rem] items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4">
     <a href="/" class="leading-none" aria-label={`${firm.name} — home`}>
@@ -65,7 +71,7 @@ const themes = [
   const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-theme-choice]'));
   const pop = document.getElementById('theme-pop') as HTMLDetailsElement | null;
   const popDot = document.getElementById('theme-pop-dot');
-  const dotClass: Record<string, string> = { clean: 'd-clean', navy: 'd-navy', light: 'd-light', dark: 'd-dark', emerald: 'd-emerald' };
+  const dotClass: Record<string, string> = { clean: 'd-clean', navy: 'd-navy', light: 'd-light', dark: 'd-dark', emerald: 'd-emerald', republic: 'd-republic', independence: 'd-independence', gandhi: 'd-gandhi' };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const sync = () => {
     buttons.forEach((b) => b.setAttribute('aria-checked', String(b.dataset.themeChoice === root.dataset.theme)));
