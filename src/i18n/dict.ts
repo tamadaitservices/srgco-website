@@ -10,6 +10,7 @@
 export type Row = [string, string, string];
 
 export const ROWS: Row[] = [
+  ['Email us', 'ఇమెయిల్ చేయండి', 'ईमेल करें'],
   // Gari the mascot
   ["Hi! I'm Gari. Tell me what you need 👋", 'నమస్తే! నేను గారి. మీకు ఏం కావాలో చెప్పండి 👋', 'नमस्ते! मैं गारी हूँ। बताइए आपको क्या चाहिए 👋'],
   ['Pick the service you need help with.', 'మీకు అవసరమైన సేవను ఎంచుకోండి.', 'वह सेवा चुनें जिसमें आपको मदद चाहिए।'],

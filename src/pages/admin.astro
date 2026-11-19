@@ -1,0 +1,165 @@
+---
+import Base from '../layouts/Base.astro';
+import { adminEnabled, isAuthed } from '../lib/admin';
+
+export const prerender = false;
+const enabled = adminEnabled();
+const authed = isAuthed(Astro.request);
+---
+<Base title="Admin" description="Site administration." noindex>
+  <section class="mx-auto max-w-4xl px-5 pt-14" id="admin" data-state={!enabled ? 'off' : authed ? 'in' : 'out'}>
+    <p class="label">Administration</p>
+    <h1 class="mt-2 !text-4xl">Edit the About page</h1>
+
+    {!enabled && (
+      <p class="mt-6 text-lg">The admin area is switched off. Set the <code>ADMIN_PASSWORD</code> environment variable on the server to enable it.</p>
+    )}
+
+    {enabled && !authed && (
+      <form id="login" class="adm-card mt-8" novalidate>
+        <label class="tool-f"><span class="tool-lab">Admin password</span><input class="field" type="password" name="password" autocomplete="current-password" required /></label>
+        <button class="btn mt-4" type="submit">Sign in</button>
+        <p class="tool-note" id="login-msg" role="status"></p>
+      </form>
+    )}
+
+    {enabled && authed && (
+      <div id="editor" class="mt-6">
+        <p class="tool-note">Changes appear on the About page as soon as you press Save. <button type="button" class="link" id="logout">Sign out</button> · <a class="link" href="/about" target="_blank" rel="noopener">View About page</a></p>
+        <div id="fields" class="adm-fields"><p>Loading…</p></div>
+        <div class="adm-bar"><button type="button" class="btn" id="save">Save changes</button><span class="tool-note" id="save-msg" role="status"></span></div>
+      </div>
+    )}
+  </section>
+</Base>
+
+<script>
+  const root = document.getElementById('admin')!;
+  const $ = (s: string) => document.querySelector(s) as HTMLElement | null;
+  const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+
+  // ---- login ----
+  $('#login')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = $('#login-msg')!;
+    msg.textContent = 'Checking…';
+    const r = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: (document.querySelector('#login [name=password]') as HTMLInputElement).value }) });
+    if (r.ok) location.reload(); else msg.textContent = (await r.json().catch(() => ({}))).error || 'Could not sign in.';
+  });
+  $('#logout')?.addEventListener('click', async () => { await fetch('/api/admin/logout', { method: 'POST' }); location.reload(); });
+
+  if (root.dataset.state === 'in') {
+    type Founder = { name: string; role: string; bio: string; photo: string };
+    type Data = { description: string; approach: string; founders: Founder[]; photos: { src: string; caption: string }[]; timeline: { year: string; text: string }[]; values: string[]; promises: string[] };
+    let data: Data;
+    const box = $('#fields')!;
+
+    const photoField = (path: string, url: string) => `
+      <div class="adm-photo" data-path="${path}">
+        ${url ? `<img src="${esc(url)}" alt="" />` : '<span class="adm-noimg">No photo</span>'}
+        <label class="btn ghost adm-up">Upload photo<input type="file" accept="image/jpeg,image/png,image/webp" hidden /></label>
+        ${url ? '<button type="button" class="link adm-rm">Remove</button>' : ''}
+      </div>`;
+
+    function render() {
+      box.innerHTML = `
+        <fieldset class="adm-card"><legend>Introduction</legend>
+          <label class="tool-f"><span class="tool-lab">About the firm</span><textarea class="field" rows="4" data-k="description">${esc(data.description)}</textarea></label>
+          <label class="tool-f"><span class="tool-lab">Our approach</span><textarea class="field" rows="3" data-k="approach">${esc(data.approach)}</textarea></label>
+        </fieldset>
+
+        <fieldset class="adm-card"><legend>Founders &amp; partners</legend>
+          ${data.founders.map((f, i) => `
+            <div class="adm-item" data-list="founders" data-i="${i}">
+              <label class="tool-f"><span class="tool-lab">Name</span><input class="field" data-f="name" value="${esc(f.name)}" /></label>
+              <label class="tool-f"><span class="tool-lab">Role / qualifications</span><input class="field" data-f="role" value="${esc(f.role)}" /></label>
+              <label class="tool-f"><span class="tool-lab">Details</span><textarea class="field" rows="3" data-f="bio">${esc(f.bio)}</textarea></label>
+              ${photoField(`founders.${i}.photo`, f.photo)}
+              <button type="button" class="link adm-del">Remove this person</button>
+            </div>`).join('')}
+          <button type="button" class="btn ghost" data-add="founders">+ Add a person</button>
+        </fieldset>
+
+        <fieldset class="adm-card"><legend>Gallery photos</legend>
+          <div class="adm-gal">${data.photos.map((p, i) => `
+            <div class="adm-item" data-list="photos" data-i="${i}"><img src="${esc(p.src)}" alt="" />
+              <input class="field" data-f="caption" placeholder="Caption (optional)" value="${esc(p.caption)}" />
+              <button type="button" class="link adm-del">Remove</button></div>`).join('')}</div>
+          <label class="btn ghost adm-up">+ Add photos<input type="file" id="gal-up" accept="image/jpeg,image/png,image/webp" multiple hidden /></label>
+        </fieldset>
+
+        <fieldset class="adm-card"><legend>Our legacy (timeline)</legend>
+          ${data.timeline.map((t, i) => `
+            <div class="adm-row" data-list="timeline" data-i="${i}">
+              <input class="field adm-yr" data-f="year" value="${esc(t.year)}" placeholder="Year" />
+              <input class="field" data-f="text" value="${esc(t.text)}" placeholder="What happened" />
+              <button type="button" class="link adm-del">✕</button></div>`).join('')}
+          <button type="button" class="btn ghost" data-add="timeline">+ Add a row</button>
+        </fieldset>
+
+        <fieldset class="adm-card"><legend>Core values &amp; promise</legend>
+          <label class="tool-f"><span class="tool-lab">Core values (one per line)</span><textarea class="field" rows="6" data-k="values">${esc(data.values.join('\n'))}</textarea></label>
+          <label class="tool-f"><span class="tool-lab">Our promise (one per line)</span><textarea class="field" rows="5" data-k="promises">${esc(data.promises.join('\n'))}</textarea></label>
+        </fieldset>`;
+    }
+
+    // collect text edits into `data` before any re-render or save
+    function collect() {
+      box.querySelectorAll<HTMLTextAreaElement>('[data-k]').forEach((el) => {
+        const k = el.dataset.k as 'description' | 'approach' | 'values' | 'promises';
+        if (k === 'values' || k === 'promises') data[k] = el.value.split('\n').map((x) => x.trim()).filter(Boolean);
+        else data[k] = el.value;
+      });
+      box.querySelectorAll<HTMLElement>('[data-list]').forEach((item) => {
+        const list = (data as any)[item.dataset.list!];
+        const row = list[Number(item.dataset.i)];
+        item.querySelectorAll<HTMLInputElement>('[data-f]').forEach((el) => { row[el.dataset.f!] = el.value; });
+      });
+    }
+
+    async function upload(file: File): Promise<string> {
+      const fd = new FormData(); fd.append('file', file);
+      const r = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || 'Upload failed.');
+      return j.url;
+    }
+    const setMsg = (t: string) => { $('#save-msg')!.textContent = t; };
+
+    box.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      const item = t.closest<HTMLElement>('[data-list]');
+      if (t.matches('.adm-del') && item) { collect(); (data as any)[item.dataset.list!].splice(Number(item.dataset.i), 1); render(); }
+      else if (t.matches('[data-add]')) {
+        collect();
+        if (t.dataset.add === 'founders') data.founders.push({ name: '', role: '', bio: '', photo: '' });
+        else data.timeline.push({ year: '', text: '' });
+        render();
+      } else if (t.matches('.adm-rm')) {
+        collect();
+        const m = (t.closest('.adm-photo') as HTMLElement).dataset.path!.split('.');
+        (data as any).founders[Number(m[1])].photo = ''; render();
+      }
+    });
+    box.addEventListener('change', async (e) => {
+      const input = e.target as HTMLInputElement;
+      if (input.type !== 'file' || !input.files?.length) return;
+      collect(); setMsg('Uploading…');
+      try {
+        if (input.id === 'gal-up') for (const f of Array.from(input.files)) data.photos.push({ src: await upload(f), caption: '' });
+        else { const m = (input.closest('.adm-photo') as HTMLElement).dataset.path!.split('.'); (data as any).founders[Number(m[1])].photo = await upload(input.files[0]); }
+        setMsg('Photo uploaded. Press Save to publish.'); render();
+      } catch (err) { setMsg((err as Error).message); }
+    });
+
+    $('#save')!.addEventListener('click', async () => {
+      collect(); setMsg('Saving…');
+      const r = await fetch('/api/admin/about', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const j = await r.json().catch(() => ({}));
+      setMsg(r.ok ? 'Saved. The About page is updated.' : j.error || 'Could not save.');
+      if (r.status === 401) setTimeout(() => location.reload(), 1200);
+    });
+
+    fetch('/api/admin/about').then((r) => r.json()).then((d) => { data = d; render(); }).catch(() => (box.textContent = 'Could not load the content.'));
+  }
+</script>

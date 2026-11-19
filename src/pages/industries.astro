@@ -1,14 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
-import { sectors } from '../data/site';
+import { sectorGroups } from '../data/site';
 ---
-<Base title="Sectors We Serve" description="Sectorial experience in pharma, agri-chem, herbal and aqua, IT/ITES, R&D, healthcare and hospitals, education and construction.">
-  <section class="mx-auto max-w-4xl px-5 pt-14">
+<Base title="Sectors We Serve" description="Sectorial experience in pharma, agri-chemicals, herbal, aquaculture, FMCG, logistics, IT, ITES, R&D, healthcare, hospitals, education and construction.">
+  <section class="mx-auto max-w-5xl px-5 pt-14">
     <p class="label">Sectorial experience</p>
     <h1 class="mt-2">Industries we have worked with</h1>
-    <p class="mt-6 text-xl">We provide audit, tax, accounting and advisory services to businesses across a range of sectors.</p>
-    <table class="ltable mt-10"><tbody>
-      {sectors.map((s, i) => <tr class="row"><td class="num w-14 text-ink-soft">{String(i + 1).padStart(2, '0')}</td><td class="text-xl text-pen">{s}</td></tr>)}
-    </tbody></table>
+    <p class="mt-6 max-w-3xl text-xl">We provide audit, tax, accounting and advisory services to businesses across a range of sectors.</p>
+    <div class="sector-grid mt-10">
+      {sectorGroups.map((g) => (
+        <section class="sector-card">
+          <h2 class="label">{g.group}</h2>
+          <ul>{g.items.map((i) => <li>{i}</li>)}</ul>
+        </section>
+      ))}
+    </div>
+    <p class="mt-10 text-lg">Do not see your sector? <a class="link" href="/contact">Tell us about your business</a>, and we will let you know how we can help.</p>
   </section>
 </Base>

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import NoteBanner from '../../components/NoteBanner.astro';
 const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const fmt = (d: Date) => d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
 const mins = (body: string) => Math.max(1, Math.round((body || '').split(/\s+/).length / 200));
@@ -13,10 +14,13 @@ const mins = (body: string) => Math.max(1, Math.round((body || '').split(/\s+/).
     <div class="notes-list">
       {notes.map((n) => (
         <a class="note-card" href={`/insights/${n.id}`}>
+          <NoteBanner title={n.data.title} category={n.data.category} service={n.data.service} image={n.data.banner} />
+          <div class="note-body">
           <p class="label">{n.data.category} · {fmt(n.data.date)} · {mins(n.body ?? '')} min read</p>
           <h2>{n.data.title}</h2>
           <p>{n.data.description}</p>
-          <span class="note-go">Read note →</span>
+          <span class="note-go">Read note →{n.data.pdf && ' · PDF available'}</span>
+          </div>
         </a>
       ))}
     </div>

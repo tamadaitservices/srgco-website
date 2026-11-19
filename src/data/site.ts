@@ -245,15 +245,78 @@ export const services: Service[] = [
       },
     ],
   },
+  {
+    slug: 'msme-services',
+    title: 'MSME Services',
+    short: 'Udyam registration, MSME benefits, loans, delayed-payment recovery and compliance.',
+    icon: 'briefcase',
+    seoTitle: 'MSME Services — Udyam Registration, Loans & Benefits in Hyderabad & Vijayawada',
+    seoDescription:
+      'Udyam (MSME) registration, collateral-free loan support, MSME scheme benefits, delayed-payment recovery and compliance guidance by S.R. Garimella & Co., Chartered Accountants.',
+    intro: 'We help micro, small and medium enterprises register, access finance and make full use of the benefits available to them.',
+    groups: [
+      {
+        heading: 'Registration & compliance',
+        items: ['Udyam (MSME) registration and updates', 'MSME classification and annual returns', 'Compliance health review for small businesses'],
+      },
+      {
+        heading: 'Finance & benefits',
+        items: ['Project reports and CMA data for bank loans', 'Collateral-free credit guarantee scheme (CGTMSE) guidance', 'Guidance on MSME schemes, incentives and tender preferences', 'Delayed payment recovery under the MSMED Act (Samadhaan)'],
+      },
+    ],
+  },
+  {
+    slug: 'startup-advisory',
+    title: 'Startup Advisory',
+    short: 'Incorporation, DPIIT recognition, tax exemptions, funding readiness and virtual CFO.',
+    icon: 'bulb',
+    seoTitle: 'Startup Advisory — Incorporation, DPIIT Recognition & Funding Support',
+    seoDescription:
+      'Startup incorporation, DPIIT recognition, Startup India tax benefits, founder and ESOP structuring, valuation, funding readiness and virtual CFO support.',
+    intro: 'We support founders from the first day: choosing the right structure, staying compliant and getting ready for funding.',
+    groups: [
+      {
+        heading: 'Getting started',
+        items: ['Choice of entity and incorporation (Private Limited, LLP)', 'DPIIT recognition under Startup India', 'Founders agreement and shareholding structure'],
+      },
+      {
+        heading: 'Growth & funding',
+        items: ['Tax exemptions and benefits for eligible startups', 'Business plan, projections and pitch financials', 'Valuation and fund-raising support', 'ESOP structuring and virtual CFO services'],
+      },
+    ],
+  },
+  {
+    slug: 'subsidies-incentives',
+    title: 'Subsidies & Incentives',
+    short: 'Identifying, applying for and claiming central and state government subsidies.',
+    icon: 'receipt',
+    seoTitle: 'Government Subsidies & Incentives Consultants — Telangana & Andhra Pradesh',
+    seoDescription:
+      'Help to identify, apply for and claim central and state government subsidies and industrial incentives, including capital, interest and power subsidies, in Telangana and Andhra Pradesh.',
+    intro: 'Many businesses leave government incentives unclaimed. We find the schemes that fit you and see the claim through to disbursement.',
+    groups: [
+      {
+        heading: 'Identify & apply',
+        items: ['Review of central and state schemes that fit your business', 'Eligibility assessment and application preparation', 'Industrial policy incentives in Telangana and Andhra Pradesh'],
+      },
+      {
+        heading: 'Claim & follow-up',
+        items: ['Capital, interest and power-cost subsidy claims', 'Documentation, verification and department follow-up', 'Chartered Accountant certificates required for claims'],
+      },
+    ],
+  },
 ];
 
-export const sectors = [
-  'Pharma / Agri Chem / Herbal / Aqua',
-  'IT / ITES',
-  'R&D / Healthcare / Hospitals',
-  'Educational institutions',
-  'Construction',
+export const sectorGroups: { group: string; items: string[] }[] = [
+  { group: 'Life sciences & agri', items: ['Pharma', 'Agri chemicals', 'Herbal', 'Aquaculture'] },
+  { group: 'Consumer & trade', items: ['FMCG', 'Logistics'] },
+  { group: 'Technology', items: ['IT', 'ITES'] },
+  { group: 'Healthcare & research', items: ['R&D', 'Healthcare', 'Hospitals'] },
+  { group: 'Institutions & infrastructure', items: ['Educational institutions', 'Construction'] },
 ];
+
+/** Flat list (used on the home page). */
+export const sectors = sectorGroups.flatMap((g) => g.items);
 
 export const team = [
   {
@@ -450,6 +513,42 @@ export const enquiryTypes: EnquiryType[] = [
       { id: 'volume', label: 'Approx. monthly transactions', type: 'text', placeholder: 'e.g. 500' },
     ],
     enclosures: ['Chart of accounts', 'Recent books / accounting software export', 'List of recurring compliances'],
+  },
+  {
+    slug: 'msme-services',
+    chip: 'MSME',
+    title: 'MSME Services',
+    docTitle: 'MSME Services Request',
+    fields: [
+      { id: 'need', label: 'Requirement', type: 'select', options: ['Udyam registration', 'Bank loan / CGTMSE support', 'MSME scheme benefits', 'Delayed payment recovery', 'Not sure yet'] },
+      { id: 'entity', label: 'Type of entity', type: 'select', options: entityOptions },
+      { id: 'turnover', label: 'Approx. annual turnover', type: 'text', placeholder: 'e.g. ₹2 crore' },
+    ],
+    enclosures: ['PAN and Aadhaar of proprietor / authorised signatory', 'GST registration details, if any', 'Latest financial statements', 'Bank account details'],
+  },
+  {
+    slug: 'startup-advisory',
+    chip: 'Startup',
+    title: 'Startup Advisory',
+    docTitle: 'Startup Advisory Request',
+    fields: [
+      { id: 'stage', label: 'Stage', type: 'select', options: ['Idea stage', 'Just incorporated', 'Early revenue', 'Raising funds', 'Scaling'] },
+      { id: 'need', label: 'Requirement', type: 'select', options: ['Incorporation', 'DPIIT recognition', 'Tax benefits', 'Fund-raising support', 'Valuation / ESOP', 'Virtual CFO'] },
+      { id: 'sector', label: 'Sector', type: 'text', placeholder: 'e.g. SaaS, agri-tech' },
+    ],
+    enclosures: ['Founders\' PAN and address proof', 'Business idea / pitch summary', 'Shareholding plan', 'Financial projections, if prepared'],
+  },
+  {
+    slug: 'subsidies-incentives',
+    chip: 'Subsidies',
+    title: 'Subsidies & Incentives',
+    docTitle: 'Subsidy & Incentive Claim Request',
+    fields: [
+      { id: 'state', label: 'State', type: 'select', options: ['Telangana', 'Andhra Pradesh', 'Other'] },
+      { id: 'activity', label: 'Business activity', type: 'text', placeholder: 'e.g. manufacturing unit' },
+      { id: 'invest', label: 'Investment in plant & machinery', type: 'text', placeholder: 'e.g. ₹3 crore' },
+    ],
+    enclosures: ['Project report / DPR', 'Registration and incorporation documents', 'Invoices for plant and machinery', 'Bank sanction letter, if any'],
   },
   {
     slug: 'other',

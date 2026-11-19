@@ -49,7 +49,7 @@ import { offices, firm, enquiryTypes } from '../data/site';
           <div class="doc-stamp" id="doc-stamp">Received<br /><small>with thanks</small></div>
 
           <header class="doc-head">
-            <p class="doc-firm">S.R. Garimella &amp; Co.</p>
+            <p class="doc-firm">S.R. Garimella &amp; Co.,</p>
             <p class="doc-sub">Chartered Accountants · Est. {firm.established}</p>
             <p class="doc-sub">Hyderabad · Vijayawada · Rajahmundry · Kakinada</p>
           </header>
@@ -98,7 +98,7 @@ import { offices, firm, enquiryTypes } from '../data/site';
             {o.address?.map((l) => <span class="block">{l}</span>)}
             <span class="block">{o.city} – {o.postal}</span>
             <a class="link block" href={`tel:${o.telHref}`}>Tel: {o.tel}</a>
-            <a class="link block" href={`mailto:${o.email}`}>{o.email}</a>
+            <a class="mail-btn mt-2" href={`mailto:${o.email}`}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> Email us</a>
           </address>
         </div>
       ))}

@@ -165,7 +165,7 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
             <div class="doc" id="hd-doc">
               <div class="doc-stamp">Received<br /><small>with thanks</small></div>
               <header class="doc-head">
-                <p class="doc-firm">S.R. Garimella &amp; Co.</p>
+                <p class="doc-firm">S.R. Garimella &amp; Co.,</p>
                 <p class="doc-sub">Chartered Accountants · Est. {firm.established}</p>
                 <p class="doc-sub">Hyderabad · Vijayawada · Rajahmundry · Kakinada</p>
               </header>
@@ -325,7 +325,7 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
               </address>
               <div class="cl-office-links">
                 <a href={`tel:${o.telHref}`}><Icon name="phone" size={18} /> {o.tel}</a>
-                <a href={`mailto:${o.email}`}><Icon name="mail" size={18} /> {o.email}</a>
+                <a class="cl-mail-btn" href={`mailto:${o.email}`}><Icon name="mail" size={18} /> Email us</a>
               </div>
             </div>
           ))}

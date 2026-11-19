@@ -12,6 +12,8 @@ const notes = defineCollection({
     date: z.coerce.date(),
     category: z.string().default('Notes'),
     service: z.string().optional(), // slug of a related service page, e.g. gst-customs
+    banner: z.string().optional(), // image in /public/notes, e.g. /notes/gst-banner.jpg (optional)
+    pdf: z.string().optional(), // PDF in /public/notes, e.g. /notes/circular.pdf (optional)
     draft: z.boolean().default(false),
   }),
 });

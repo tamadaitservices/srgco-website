@@ -1,29 +1,107 @@
 ---
 import Base from '../layouts/Base.astro';
-import { firm, timeline, values, promises } from '../data/site';
+import { offices } from '../data/site';
+import { loadAbout } from '../lib/about';
+
+// Rendered on request so edits made in /admin appear immediately.
+export const prerender = false;
+const a = loadAbout();
+const initials = (n: string) => n.replace(/^(Late|Sri|Mr|Ms|Dr)\.?\s+/i, '').split(/[\s.]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+const places = offices.filter((o) => o.primary).map((o) => {
+  const q = [...(o.address ?? []), `${o.city} ${o.postal ?? ''}`, 'India'].join(', ');
+  const enc = encodeURIComponent(`S.R. Garimella & Co., ${q}`);
+  return { city: o.city, q, embed: `https://maps.google.com/maps?q=${enc}&z=16&output=embed`, open: `https://www.google.com/maps/search/?api=1&query=${enc}`, dir: `https://www.google.com/maps/dir/?api=1&destination=${enc}`, address: [...(o.address ?? []), `${o.city} – ${o.postal}`] };
+});
 ---
-<Base title="About" description="Learn about S.R. Garimella & Co., Chartered Accountants established in 1989 — our firm, approach, legacy and core values.">
+<Base title="About" description="Learn about S.R. Garimella & Co., Chartered Accountants established in 1989 — our founders, our firm, approach, legacy and core values.">
   <section class="ledger">
     <div class="mx-auto max-w-4xl px-5 pb-20 pt-14 md:pl-24">
       <p class="label">Who we are</p>
-      <h1 class="mt-3">About S.R. Garimella &amp; Co.</h1>
+      <h1 class="mt-3">About S.R. Garimella &amp; Co.,</h1>
       <div class="mt-10 space-y-6 text-xl">
-        <p>{firm.description}</p>
-        <p>{firm.approach}</p>
+        <p>{a.description}</p>
+        <p>{a.approach}</p>
       </div>
     </div>
   </section>
+
+  {a.founders.length > 0 && (
+    <section class="mx-auto max-w-5xl px-5 pt-20" aria-labelledby="founders-h">
+      <p class="label">The people behind the firm</p>
+      <h2 id="founders-h" class="mt-2">Founders &amp; partners</h2>
+      <div class="founder-grid mt-8">
+        {a.founders.map((f) => (
+          <article class="founder">
+            {f.photo ? <img src={f.photo} alt={f.name} loading="lazy" width="320" height="320" /> : <div class="founder-ph" aria-hidden="true">{initials(f.name)}</div>}
+            <div>
+              <h3>{f.name}</h3>
+              <p class="label mt-1">{f.role}</p>
+              <p class="mt-3 text-lg">{f.bio}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {a.photos.length > 0 && (
+    <section class="mx-auto max-w-5xl px-5 pt-20" aria-labelledby="gallery-h">
+      <p class="label">Our practice</p>
+      <h2 id="gallery-h" class="mt-2">Gallery</h2>
+      <div class="about-gallery mt-8">
+        {a.photos.map((p) => (<figure><img src={p.src} alt={p.caption || 'S.R. Garimella & Co.'} loading="lazy" />{p.caption && <figcaption>{p.caption}</figcaption>}</figure>))}
+      </div>
+    </section>
+  )}
+
   <section class="mx-auto max-w-4xl px-5 pt-20">
     <p class="label">Our legacy</p>
     <table class="ltable mt-4">
       <thead><tr><th class="w-28">Year</th><th>Particulars</th></tr></thead>
-      <tbody>{timeline.map((t) => <tr><td class="num text-xl text-pen">{t.year}</td><td class="text-xl">{t.text}</td></tr>)}</tbody>
+      <tbody>{a.timeline.map((t) => <tr><td class="num text-xl text-pen">{t.year}</td><td class="text-xl">{t.text}</td></tr>)}</tbody>
     </table>
   </section>
+
   <section class="mx-auto grid max-w-4xl gap-12 px-5 pt-20 md:grid-cols-2">
     <div><h2>Core values</h2>
-      <ul class="mt-6">{values.map((v) => <li class="border-b border-rule py-2 text-xl text-pen">{v.name}</li>)}</ul></div>
+      <ul class="mt-6">{a.values.map((v) => <li class="border-b border-rule py-2 text-xl text-pen">{v}</li>)}</ul></div>
     <div><h2>Our promise</h2>
-      <ol class="mt-6">{promises.map((p, i) => <li class="flex gap-3 border-b border-rule py-2 text-lg"><span class="num text-sm text-stamp">{String(i + 1).padStart(2, '0')}</span>{p}</li>)}</ol></div>
+      <ol class="mt-6">{a.promises.map((p, i) => <li class="flex gap-3 border-b border-rule py-2 text-lg"><span class="num text-sm text-stamp">{String(i + 1).padStart(2, '0')}</span>{p}</li>)}</ol></div>
+  </section>
+
+  <section class="mx-auto max-w-5xl px-5 pt-20" aria-labelledby="map-h" id="map">
+    <p class="label">Find us</p>
+    <h2 id="map-h" class="mt-2">Our offices on the map</h2>
+    <div class="map-tabs mt-6" role="tablist" aria-label="Choose an office">
+      {places.map((p, i) => <button type="button" role="tab" aria-selected={i === 0 ? 'true' : 'false'} data-map-tab={i}>{p.city}</button>)}
+    </div>
+    {places.map((p, i) => (
+      <div class="map-panel" data-map-panel={i} hidden={i !== 0}>
+        <div class="map-frame">
+          <iframe title={`Map of our ${p.city} office`} data-src={p.embed} src={i === 0 ? p.embed : undefined} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
+        </div>
+        <div class="map-info">
+          <address class="not-italic text-lg">{p.address.map((l) => <span class="block">{l}</span>)}</address>
+          <div class="map-actions">
+            <a class="mail-btn" href={p.dir} target="_blank" rel="noopener noreferrer">Get directions</a>
+            <a class="mail-btn" href={p.open} target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+          </div>
+        </div>
+      </div>
+    ))}
   </section>
 </Base>
+
+<script>
+  const tabs = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-map-tab]'));
+  const panels = Array.from(document.querySelectorAll<HTMLElement>('[data-map-panel]'));
+  tabs.forEach((t) => t.addEventListener('click', () => {
+    const i = t.dataset.mapTab!;
+    tabs.forEach((x) => x.setAttribute('aria-selected', String(x === t)));
+    panels.forEach((p) => {
+      p.hidden = p.dataset.mapPanel !== i;
+      const f = p.querySelector('iframe');
+      if (!p.hidden && f && !f.getAttribute('src')) f.setAttribute('src', f.dataset.src!);
+    });
+  }));
+</script>

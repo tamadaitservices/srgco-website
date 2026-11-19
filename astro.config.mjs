@@ -25,7 +25,7 @@ export default defineConfig({
   site,
   output: 'static',
   adapter: node({ mode: 'standalone' }),
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap({ customPages: [`${site}/about`], filter: (page) => !page.includes('/admin') })],
   vite: { plugins: [tailwindcss()] },
   server: { host: true },
 });

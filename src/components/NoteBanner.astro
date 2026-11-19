@@ -1,0 +1,19 @@
+---
+// Banner for a note: the uploaded image if there is one, otherwise a generated
+// banner coloured by category with the related service's icon.
+import Icon from './Icon.astro';
+import { services } from '../data/site';
+interface Props { title: string; category: string; service?: string; image?: string; size?: 'card' | 'hero' }
+const { title, category, service, image, size = 'card' } = Astro.props;
+const icon = services.find((s) => s.slug === service)?.icon ?? 'receipt';
+let h = 0; for (const c of category) h = (h * 31 + c.charCodeAt(0)) % 360;
+const hue = [212, 168, 28, 262, 340, 190][h % 6];
+---
+<div class:list={['note-banner', size === 'hero' && 'hero']} style={`--bh:${hue}`}>
+  {image
+    ? <img src={image} alt="" loading={size === 'hero' ? 'eager' : 'lazy'} />
+    : (<>
+        <span class="nb-ico" aria-hidden="true"><Icon name={icon} size={size === 'hero' ? 84 : 56} /></span>
+        <span class="nb-cat">{category}</span>
+      </>)}
+</div>

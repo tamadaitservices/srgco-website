@@ -66,3 +66,19 @@ All firm content (services, team, offices, enquiry types) lives in `src/data/sit
 - Confirm the domain and set `PUBLIC_SITE_URL`.
 - Add logo, partner and office photos.
 - Review the per-service "documents to keep ready" lists in `src/data/site.ts` with the client.
+
+
+## Admin panel (edit the About page)
+
+Open `/admin` and sign in with the password set in the `ADMIN_PASSWORD` environment variable. From there the client can edit
+the About page text, founders and partners (with photos), gallery photos, the legacy timeline, core values and promise.
+If `ADMIN_PASSWORD` is not set the admin is switched off.
+
+* Edited content is saved as `about.json` and uploaded photos in `uploads/`, inside `DATA_DIR` (default: `./data` next to the app).
+* **Set `DATA_DIR` to a folder outside the app folder** (for example `/home/<user>/srg-data`) so a re-deploy never erases the client's edits.
+* The About page is rendered on request, so changes show immediately after pressing Save.
+
+## Notes: banners and PDFs
+
+In a note's front matter, add optional `banner: /notes/my-banner.jpg` and `pdf: /notes/my-circular.pdf` (place the files in `public/notes/`).
+Without a banner, one is generated from the note's category. Every note has a "Save this note as PDF" button; notes with a `pdf` also get "View PDF" and "Download PDF".
