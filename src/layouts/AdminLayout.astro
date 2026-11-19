@@ -1,0 +1,19 @@
+---
+// Standalone shell for /admin: no public header, footer, chat or theme switcher.
+import '../styles/admin.css';
+interface Props { title?: string }
+const { title = 'Admin' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title} — S.R. Garimella &amp; Co.,</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="ad">
+    <slot />
+  </body>
+</html>

@@ -1,122 +1,261 @@
 ---
-import Base from '../layouts/Base.astro';
-import { adminEnabled, isAuthed } from '../lib/admin';
+import AdminLayout from '../layouts/AdminLayout.astro';
+import AdminFlag from '../components/AdminFlag.astro';
+import { adminEmail, adminEnabled, isAuthed, validResetToken } from '../lib/admin';
 
 export const prerender = false;
 const enabled = adminEnabled();
 const authed = isAuthed(Astro.request);
+const resetTok = Astro.url.searchParams.get('reset') || '';
+const resetOk = enabled && !authed && validResetToken(resetTok);
+const email = adminEmail();
+const dots = Array.from({ length: 16 }, (_, i) => ({ l: (i * 37) % 100, d: 9 + ((i * 7) % 9), s: (i * 1.3) % 8 }));
+const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
 ---
-<Base title="Admin" description="Site administration." noindex>
-  <section class="mx-auto max-w-4xl px-5 pt-14" id="admin" data-state={!enabled ? 'off' : authed ? 'in' : 'out'}>
-    <p class="label">Administration</p>
-    <h1 class="mt-2 !text-4xl">Edit the About page</h1>
+<AdminLayout title="Admin">
+  {!enabled && (
+    <div class="ad-off">
+      <div class="ad-strip" style="margin-bottom:2rem"></div>
+      <h1 class="ad-h">Admin is switched off</h1>
+      <p class="ad-sub">Set the <b>ADMIN_EMAIL</b> and <b>ADMIN_PASSWORD</b> environment variables on the server to turn it on.</p>
+    </div>
+  )}
 
-    {!enabled && (
-      <p class="mt-6 text-lg">The admin area is switched off. Set the <code>ADMIN_PASSWORD</code> environment variable on the server to enable it.</p>
-    )}
+  {enabled && !authed && (
+    <main class="ad-auth" id="auth" data-view={resetOk ? 'reset' : 'login'} data-token={resetOk ? resetTok : ''}>
+      <section class="ad-hero">
+        <div class="ad-dots" aria-hidden="true">{dots.map((d) => <i style={`left:${d.l}%;bottom:-10px;animation-duration:${d.d}s;animation-delay:${d.s}s`}></i>)}</div>
+        <div class="ad-hero-inner">
+          <AdminFlag />
+          <h1>S.R. Garimella &amp; Co.,<br /><span>Admin Console</span></h1>
+          <p>Manage your website content, appearance and security from one place.</p>
+        </div>
+      </section>
 
-    {enabled && !authed && (
-      <form id="login" class="adm-card mt-8" novalidate>
-        <label class="tool-f"><span class="tool-lab">Admin password</span><input class="field" type="password" name="password" autocomplete="current-password" required /></label>
-        <button class="btn mt-4" type="submit">Sign in</button>
-        <p class="tool-note" id="login-msg" role="status"></p>
-      </form>
-    )}
+      <section class="ad-panel">
+        <div class="ad-card" id="card">
+          <div class="ad-brand">
+            <span class="ad-badge" aria-hidden="true"><svg viewBox="-30 -30 60 60"><circle r="26" fill="#fff" stroke="#000080" stroke-width="3" /><circle r="4" fill="#000080" />{chakra.map((a) => <line y1="-5" y2="-24" stroke="#000080" stroke-width="1.4" transform={`rotate(${a})`} />)}</svg></span>
+            <div><b>Administrator</b><small>Secure sign-in</small></div>
+          </div>
 
-    {enabled && authed && (
-      <div id="editor" class="mt-6">
-        <p class="tool-note">Changes appear on the About page as soon as you press Save. <button type="button" class="link" id="logout">Sign out</button> · <a class="link" href="/about" target="_blank" rel="noopener">View About page</a></p>
-        <div id="fields" class="adm-fields"><p>Loading…</p></div>
-        <div class="adm-bar"><button type="button" class="btn" id="save">Save changes</button><span class="tool-note" id="save-msg" role="status"></span></div>
+          <form id="f-login" data-v="login" novalidate>
+            <h2>Welcome back</h2>
+            <p class="ad-sub">Sign in to manage the website.</p>
+            <label class="ad-field"><span>Email</span><input class="ad-in" type="email" name="email" autocomplete="username" required /></label>
+            <label class="ad-field"><span>Password</span><span class="ad-pw"><input class="ad-in" type="password" name="password" autocomplete="current-password" required /><button type="button" class="ad-eye" data-eye>Show</button></span></label>
+            <button class="ad-btn block" type="submit">Sign in <span aria-hidden="true">→</span></button>
+            <p class="ad-msg" role="status"></p>
+            <p class="ad-row"><button type="button" class="ad-linkbtn" data-go="forgot">Forgot password?</button><a href="/">← Back to website</a></p>
+          </form>
+
+          <form id="f-forgot" data-v="forgot" novalidate hidden>
+            <h2>Reset your password</h2>
+            <p class="ad-sub">Enter the administrator email. We will send a reset link, valid for 30 minutes.</p>
+            <label class="ad-field"><span>Email</span><input class="ad-in" type="email" name="email" autocomplete="username" required /></label>
+            <button class="ad-btn block" type="submit">Email me a reset link</button>
+            <p class="ad-msg" role="status"></p>
+            <p class="ad-row"><button type="button" class="ad-linkbtn" data-go="login">← Back to sign in</button></p>
+          </form>
+
+          <form id="f-reset" data-v="reset" novalidate hidden>
+            <h2>Choose a new password</h2>
+            <p class="ad-sub">Use at least 8 characters.</p>
+            <label class="ad-field"><span>New password</span><span class="ad-pw"><input class="ad-in" type="password" name="password" autocomplete="new-password" required /><button type="button" class="ad-eye" data-eye>Show</button></span></label>
+            <label class="ad-field"><span>Confirm password</span><input class="ad-in" type="password" name="again" autocomplete="new-password" required /></label>
+            <button class="ad-btn block" type="submit">Save and sign in</button>
+            <p class="ad-msg" role="status"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+  )}
+
+  {enabled && authed && (
+    <div id="app">
+      <header class="ad-top">
+        <div class="ad-strip"></div>
+        <div class="ad-top-in">
+          <div class="ad-brand">
+            <span class="ad-badge" aria-hidden="true"><svg viewBox="-30 -30 60 60"><circle r="26" fill="#fff" stroke="#000080" stroke-width="3" /><circle r="4" fill="#000080" />{chakra.map((a) => <line y1="-5" y2="-24" stroke="#000080" stroke-width="1.4" transform={`rotate(${a})`} />)}</svg></span>
+            <div><b>S.R. Garimella &amp; Co.,</b><small>Admin Console</small></div>
+          </div>
+          <div class="ad-user">
+            <span title={email}>{email}</span>
+            <a class="ad-btn ghost sm" href="/" target="_blank" rel="noopener">View site</a>
+            <button class="ad-btn ghost sm" type="button" id="logout">Sign out</button>
+          </div>
+        </div>
+      </header>
+
+      <div class="ad-shell">
+        <nav class="ad-nav" role="tablist" aria-label="Admin sections">
+          <button role="tab" aria-selected="true" data-tab="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z" /><path d="M8 12h8M8 16h5" /></svg>About page</button>
+          <button role="tab" aria-selected="false" data-tab="look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 3v18M3 12h9" /></svg>Appearance</button>
+          <button role="tab" aria-selected="false" data-tab="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>Security</button>
+        </nav>
+
+        <main>
+          <section class="ad-view" data-panel="about">
+            <h1 class="ad-h">About page</h1>
+            <p class="ad-sub">Edit what visitors see on the About page. Changes go live when you press Save.</p>
+            <div id="about-fields"><p class="ad-sub">Loading…</p></div>
+          </section>
+
+          <section class="ad-view" data-panel="look" hidden>
+            <h1 class="ad-h">Appearance</h1>
+            <p class="ad-sub">Choose which colour themes visitors can pick from, and which one new visitors see first. Turn a theme off to remove it from the website's theme switcher.</p>
+            <div id="theme-fields" class="ad-themes"></div>
+          </section>
+
+          <section class="ad-view" data-panel="security" hidden>
+            <h1 class="ad-h">Security</h1>
+            <p class="ad-sub">Signed in as <b>{email}</b>.</p>
+            <form class="ad-sec" id="f-pw" novalidate>
+              <h3>Change password</h3>
+              <label class="ad-field"><span>Current password</span><input class="ad-in" type="password" name="current" autocomplete="current-password" /></label>
+              <label class="ad-field"><span>New password</span><span class="ad-pw"><input class="ad-in" type="password" name="next" autocomplete="new-password" /><button type="button" class="ad-eye" data-eye>Show</button></span><span class="ad-meter"><i id="meter"></i></span></label>
+              <label class="ad-field"><span>Confirm new password</span><input class="ad-in" type="password" name="again" autocomplete="new-password" /></label>
+              <button class="ad-btn" type="submit" style="margin-top:1.2rem">Update password</button>
+              <p class="ad-msg" role="status" id="pw-msg"></p>
+            </form>
+            <div class="ad-sec"><h3>Forgot it later?</h3><p class="ad-sub">On the sign-in page choose “Forgot password?”. A reset link is emailed to {email} (needs the website's email settings to be configured).</p></div>
+          </section>
+        </main>
       </div>
-    )}
-  </section>
-</Base>
+
+      <div class="ad-bar" id="bar"><div class="ad-bar-in"><button class="ad-btn" type="button" id="save">Save changes</button><span class="ad-toast" id="toast" role="status"></span></div></div>
+    </div>
+  )}
+</AdminLayout>
 
 <script>
-  const root = document.getElementById('admin')!;
-  const $ = (s: string) => document.querySelector(s) as HTMLElement | null;
+  const $ = <T extends HTMLElement = HTMLElement>(s: string, r: ParentNode = document) => r.querySelector(s) as T | null;
   const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
-
-  // ---- login ----
-  $('#login')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const msg = $('#login-msg')!;
-    msg.textContent = 'Checking…';
-    const r = await fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: (document.querySelector('#login [name=password]') as HTMLInputElement).value }) });
-    if (r.ok) location.reload(); else msg.textContent = (await r.json().catch(() => ({}))).error || 'Could not sign in.';
+  const post = async (url: string, body: unknown, method = 'POST') => {
+    const r = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return { ok: r.ok, status: r.status, j: (await r.json().catch(() => ({}))) as any };
+  };
+  document.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-eye]');
+    if (!b) return;
+    const inp = b.parentElement!.querySelector('input')!;
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    b.textContent = inp.type === 'password' ? 'Show' : 'Hide';
   });
-  $('#logout')?.addEventListener('click', async () => { await fetch('/api/admin/logout', { method: 'POST' }); location.reload(); });
 
-  if (root.dataset.state === 'in') {
+  // =============== signed-out screens ===============
+  const auth = $('#auth');
+  if (auth) {
+    const show = (v: string) => {
+      auth.dataset.view = v;
+      auth.querySelectorAll<HTMLFormElement>('form[data-v]').forEach((f) => { f.hidden = f.dataset.v !== v; f.querySelector<HTMLElement>('.ad-msg')!.textContent = ''; });
+      $('input', $(`form[data-v="${v}"]`, auth)!)?.focus();
+    };
+    show(auth.dataset.view || 'login');
+    auth.querySelectorAll<HTMLElement>('[data-go]').forEach((b) => b.addEventListener('click', () => show(b.dataset.go!)));
+    const say = (f: HTMLElement, t: string, kind = '') => {
+      const m = $('.ad-msg', f)!; m.textContent = t; m.className = 'ad-msg ' + kind;
+      if (kind === 'err') { const c = $('#card')!; c.classList.remove('ad-shake'); void c.offsetWidth; c.classList.add('ad-shake'); }
+    };
+    const enter = () => { auth.classList.add('leaving'); setTimeout(() => (location.href = '/admin'), 700); };
+    const val = (f: HTMLFormElement, n: string) => (f.elements.namedItem(n) as HTMLInputElement).value;
+
+    $<HTMLFormElement>('#f-login')!.addEventListener('submit', async (e) => {
+      e.preventDefault(); const f = e.target as HTMLFormElement; const btn = $<HTMLButtonElement>('button[type=submit]', f)!;
+      btn.disabled = true; say(f, 'Signing in…');
+      const r = await post('/api/admin/login', { email: val(f, 'email'), password: val(f, 'password') });
+      btn.disabled = false;
+      if (r.ok) { say(f, 'Welcome!', 'ok'); enter(); } else say(f, r.j.error || 'Could not sign in.', 'err');
+    });
+    $<HTMLFormElement>('#f-forgot')!.addEventListener('submit', async (e) => {
+      e.preventDefault(); const f = e.target as HTMLFormElement; const btn = $<HTMLButtonElement>('button[type=submit]', f)!;
+      btn.disabled = true; say(f, 'Sending…');
+      const r = await post('/api/admin/forgot', { email: val(f, 'email') });
+      btn.disabled = false; say(f, r.ok ? r.j.message : r.j.error || 'Could not send.', r.ok ? 'ok' : 'err');
+    });
+    $<HTMLFormElement>('#f-reset')!.addEventListener('submit', async (e) => {
+      e.preventDefault(); const f = e.target as HTMLFormElement; const btn = $<HTMLButtonElement>('button[type=submit]', f)!;
+      if (val(f, 'password') !== val(f, 'again')) return say(f, 'The two passwords do not match.', 'err');
+      btn.disabled = true; say(f, 'Saving…');
+      const r = await post('/api/admin/reset', { token: auth.dataset.token, password: val(f, 'password') });
+      btn.disabled = false;
+      if (r.ok) { say(f, 'Password updated.', 'ok'); enter(); } else say(f, r.j.error || 'Could not reset.', 'err');
+    });
+  }
+
+  // =============== signed-in dashboard ===============
+  const app = $('#app');
+  if (app) {
+    const toast = $('#toast')!;
+    const note = (t: string, kind = '') => { toast.textContent = t; toast.className = 'ad-toast ' + kind; };
+    $('#logout')!.addEventListener('click', async () => { await post('/api/admin/logout', {}); location.href = '/admin'; });
+
+    // ---- tabs ----
+    let tab = 'about';
+    const tabs = Array.from(app.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+    const panels = Array.from(app.querySelectorAll<HTMLElement>('[data-panel]'));
+    const go = (t: string) => {
+      tab = t; note('');
+      tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+      panels.forEach((p) => { const on = p.dataset.panel === t; p.hidden = !on; if (on) { p.style.animation = 'none'; void p.offsetWidth; p.style.animation = ''; } });
+      $('#bar')!.style.display = t === 'security' ? 'none' : '';
+      history.replaceState(null, '', '#' + t);
+    };
+    tabs.forEach((b) => b.addEventListener('click', () => go(b.dataset.tab!)));
+    go(['about', 'look', 'security'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'about');
+
+    // ---- About editor ----
     type Founder = { name: string; role: string; bio: string; photo: string };
-    type Data = { description: string; approach: string; founders: Founder[]; photos: { src: string; caption: string }[]; timeline: { year: string; text: string }[]; values: string[]; promises: string[] };
-    let data: Data;
-    const box = $('#fields')!;
-
-    const photoField = (path: string, url: string) => `
-      <div class="adm-photo" data-path="${path}">
-        ${url ? `<img src="${esc(url)}" alt="" />` : '<span class="adm-noimg">No photo</span>'}
-        <label class="btn ghost adm-up">Upload photo<input type="file" accept="image/jpeg,image/png,image/webp" hidden /></label>
-        ${url ? '<button type="button" class="link adm-rm">Remove</button>' : ''}
+    type About = { description: string; approach: string; founders: Founder[]; photos: { src: string; caption: string }[]; timeline: { year: string; text: string }[]; values: string[]; promises: string[] };
+    let about: About;
+    const box = $('#about-fields')!;
+    const photoField = (i: number, url: string) => `
+      <div class="ad-photo" data-i="${i}">
+        ${url ? `<img src="${esc(url)}" alt="" />` : '<span class="ad-noimg">No photo</span>'}
+        <label class="ad-btn ghost sm">Upload photo<input type="file" accept="image/jpeg,image/png,image/webp" hidden /></label>
+        ${url ? '<button type="button" class="ad-linkbtn" data-act="rm-photo">Remove</button>' : ''}
       </div>`;
-
-    function render() {
+    function renderAbout() {
       box.innerHTML = `
-        <fieldset class="adm-card"><legend>Introduction</legend>
-          <label class="tool-f"><span class="tool-lab">About the firm</span><textarea class="field" rows="4" data-k="description">${esc(data.description)}</textarea></label>
-          <label class="tool-f"><span class="tool-lab">Our approach</span><textarea class="field" rows="3" data-k="approach">${esc(data.approach)}</textarea></label>
-        </fieldset>
-
-        <fieldset class="adm-card"><legend>Founders &amp; partners</legend>
-          ${data.founders.map((f, i) => `
-            <div class="adm-item" data-list="founders" data-i="${i}">
-              <label class="tool-f"><span class="tool-lab">Name</span><input class="field" data-f="name" value="${esc(f.name)}" /></label>
-              <label class="tool-f"><span class="tool-lab">Role / qualifications</span><input class="field" data-f="role" value="${esc(f.role)}" /></label>
-              <label class="tool-f"><span class="tool-lab">Details</span><textarea class="field" rows="3" data-f="bio">${esc(f.bio)}</textarea></label>
-              ${photoField(`founders.${i}.photo`, f.photo)}
-              <button type="button" class="link adm-del">Remove this person</button>
+        <div class="ad-sec"><h3>Introduction</h3>
+          <label class="ad-field"><span>About the firm</span><textarea class="ad-in" rows="4" data-k="description">${esc(about.description)}</textarea></label>
+          <label class="ad-field"><span>Our approach</span><textarea class="ad-in" rows="3" data-k="approach">${esc(about.approach)}</textarea></label>
+        </div>
+        <div class="ad-sec"><h3>Founders &amp; partners</h3>
+          ${about.founders.map((f, i) => `
+            <div class="ad-item" data-list="founders" data-i="${i}">
+              <label class="ad-field" style="margin-top:0"><span>Name</span><input class="ad-in" data-f="name" value="${esc(f.name)}" /></label>
+              <label class="ad-field"><span>Role / qualifications</span><input class="ad-in" data-f="role" value="${esc(f.role)}" /></label>
+              <label class="ad-field"><span>Details</span><textarea class="ad-in" rows="3" data-f="bio">${esc(f.bio)}</textarea></label>
+              ${photoField(i, f.photo)}
+              <button type="button" class="ad-btn danger sm" data-act="del">Remove this person</button>
             </div>`).join('')}
-          <button type="button" class="btn ghost" data-add="founders">+ Add a person</button>
-        </fieldset>
-
-        <fieldset class="adm-card"><legend>Gallery photos</legend>
-          <div class="adm-gal">${data.photos.map((p, i) => `
-            <div class="adm-item" data-list="photos" data-i="${i}"><img src="${esc(p.src)}" alt="" />
-              <input class="field" data-f="caption" placeholder="Caption (optional)" value="${esc(p.caption)}" />
-              <button type="button" class="link adm-del">Remove</button></div>`).join('')}</div>
-          <label class="btn ghost adm-up">+ Add photos<input type="file" id="gal-up" accept="image/jpeg,image/png,image/webp" multiple hidden /></label>
-        </fieldset>
-
-        <fieldset class="adm-card"><legend>Our legacy (timeline)</legend>
-          ${data.timeline.map((t, i) => `
-            <div class="adm-row" data-list="timeline" data-i="${i}">
-              <input class="field adm-yr" data-f="year" value="${esc(t.year)}" placeholder="Year" />
-              <input class="field" data-f="text" value="${esc(t.text)}" placeholder="What happened" />
-              <button type="button" class="link adm-del">✕</button></div>`).join('')}
-          <button type="button" class="btn ghost" data-add="timeline">+ Add a row</button>
-        </fieldset>
-
-        <fieldset class="adm-card"><legend>Core values &amp; promise</legend>
-          <label class="tool-f"><span class="tool-lab">Core values (one per line)</span><textarea class="field" rows="6" data-k="values">${esc(data.values.join('\n'))}</textarea></label>
-          <label class="tool-f"><span class="tool-lab">Our promise (one per line)</span><textarea class="field" rows="5" data-k="promises">${esc(data.promises.join('\n'))}</textarea></label>
-        </fieldset>`;
+          <button type="button" class="ad-btn ghost sm" style="margin-top:1rem" data-act="add-founder">+ Add a person</button>
+        </div>
+        <div class="ad-sec"><h3>Gallery photos</h3>
+          <div class="ad-gal">${about.photos.map((p, i) => `<div data-list="photos" data-i="${i}"><img src="${esc(p.src)}" alt="" /><input class="ad-in" data-f="caption" placeholder="Caption (optional)" value="${esc(p.caption)}" /><button type="button" class="ad-linkbtn" data-act="del">Remove</button></div>`).join('')}</div>
+          <label class="ad-btn ghost sm">+ Add photos<input type="file" id="gal-up" accept="image/jpeg,image/png,image/webp" multiple hidden /></label>
+        </div>
+        <div class="ad-sec"><h3>Our legacy (timeline)</h3>
+          <div class="ad-list">${about.timeline.map((t, i) => `<div class="ad-trow" data-list="timeline" data-i="${i}"><input class="ad-in" data-f="year" value="${esc(t.year)}" placeholder="Year" /><input class="ad-in" data-f="text" value="${esc(t.text)}" placeholder="What happened" /><button type="button" class="ad-linkbtn" data-act="del" aria-label="Remove row">✕</button></div>`).join('')}</div>
+          <button type="button" class="ad-btn ghost sm" style="margin-top:1rem" data-act="add-row">+ Add a row</button>
+        </div>
+        <div class="ad-sec"><h3>Core values &amp; promise</h3>
+          <label class="ad-field"><span>Core values (one per line)</span><textarea class="ad-in" rows="6" data-k="values">${esc(about.values.join('\n'))}</textarea></label>
+          <label class="ad-field"><span>Our promise (one per line)</span><textarea class="ad-in" rows="5" data-k="promises">${esc(about.promises.join('\n'))}</textarea></label>
+        </div>`;
     }
-
-    // collect text edits into `data` before any re-render or save
     function collect() {
       box.querySelectorAll<HTMLTextAreaElement>('[data-k]').forEach((el) => {
         const k = el.dataset.k as 'description' | 'approach' | 'values' | 'promises';
-        if (k === 'values' || k === 'promises') data[k] = el.value.split('\n').map((x) => x.trim()).filter(Boolean);
-        else data[k] = el.value;
+        if (k === 'values' || k === 'promises') about[k] = el.value.split('\n').map((x) => x.trim()).filter(Boolean); else about[k] = el.value;
       });
       box.querySelectorAll<HTMLElement>('[data-list]').forEach((item) => {
-        const list = (data as any)[item.dataset.list!];
-        const row = list[Number(item.dataset.i)];
+        const row = (about as any)[item.dataset.list!][Number(item.dataset.i)];
         item.querySelectorAll<HTMLInputElement>('[data-f]').forEach((el) => { row[el.dataset.f!] = el.value; });
       });
     }
-
     async function upload(file: File): Promise<string> {
       const fd = new FormData(); fd.append('file', file);
       const r = await fetch('/api/admin/upload', { method: 'POST', body: fd });
@@ -124,42 +263,90 @@ const authed = isAuthed(Astro.request);
       if (!r.ok) throw new Error(j.error || 'Upload failed.');
       return j.url;
     }
-    const setMsg = (t: string) => { $('#save-msg')!.textContent = t; };
-
     box.addEventListener('click', (e) => {
-      const t = e.target as HTMLElement;
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-act]'); if (!t) return;
+      collect();
       const item = t.closest<HTMLElement>('[data-list]');
-      if (t.matches('.adm-del') && item) { collect(); (data as any)[item.dataset.list!].splice(Number(item.dataset.i), 1); render(); }
-      else if (t.matches('[data-add]')) {
-        collect();
-        if (t.dataset.add === 'founders') data.founders.push({ name: '', role: '', bio: '', photo: '' });
-        else data.timeline.push({ year: '', text: '' });
-        render();
-      } else if (t.matches('.adm-rm')) {
-        collect();
-        const m = (t.closest('.adm-photo') as HTMLElement).dataset.path!.split('.');
-        (data as any).founders[Number(m[1])].photo = ''; render();
-      }
+      const a = t.dataset.act;
+      if (a === 'del' && item) (about as any)[item.dataset.list!].splice(Number(item.dataset.i), 1);
+      else if (a === 'add-founder') about.founders.push({ name: '', role: '', bio: '', photo: '' });
+      else if (a === 'add-row') about.timeline.push({ year: '', text: '' });
+      else if (a === 'rm-photo') about.founders[Number(t.closest<HTMLElement>('.ad-photo')!.dataset.i)].photo = '';
+      renderAbout();
     });
     box.addEventListener('change', async (e) => {
       const input = e.target as HTMLInputElement;
       if (input.type !== 'file' || !input.files?.length) return;
-      collect(); setMsg('Uploading…');
+      collect(); note('Uploading…');
       try {
-        if (input.id === 'gal-up') for (const f of Array.from(input.files)) data.photos.push({ src: await upload(f), caption: '' });
-        else { const m = (input.closest('.adm-photo') as HTMLElement).dataset.path!.split('.'); (data as any).founders[Number(m[1])].photo = await upload(input.files[0]); }
-        setMsg('Photo uploaded. Press Save to publish.'); render();
-      } catch (err) { setMsg((err as Error).message); }
+        if (input.id === 'gal-up') for (const f of Array.from(input.files)) about.photos.push({ src: await upload(f), caption: '' });
+        else about.founders[Number(input.closest<HTMLElement>('.ad-photo')!.dataset.i)].photo = await upload(input.files[0]);
+        note('Photo uploaded. Press Save to publish.', 'ok'); renderAbout();
+      } catch (err) { note((err as Error).message, 'err'); }
     });
 
+    // ---- Appearance ----
+    const THEMES: { id: string; name: string; note: string; bg: string; fg: string; ac: string }[] = [
+      { id: 'clean', name: 'Clean', note: 'Bright and minimal', bg: '#ffffff', fg: '#0b2a4a', ac: '#0b5394' },
+      { id: 'navy', name: 'Navy & Copper', note: 'Premium, deep blue', bg: '#0f2342', fg: '#f3ead9', ac: '#c8814a' },
+      { id: 'light', name: 'Ledger', note: 'Paper and pen', bg: '#faf8f2', fg: '#2d3b50', ac: '#b5483a' },
+      { id: 'dark', name: 'Night', note: 'Dark mode', bg: '#14171f', fg: '#e9e6df', ac: '#7fb0ff' },
+      { id: 'emerald', name: 'Emerald & Gold', note: 'Rich green', bg: '#0b3d2e', fg: '#f4efd8', ac: '#d4af37' },
+    ];
+    let cfg = { enabled: THEMES.map((t) => t.id), defaultTheme: 'navy' };
+    const tbox = $('#theme-fields')!;
+    function renderThemes() {
+      tbox.innerHTML = THEMES.map((t) => {
+        const on = cfg.enabled.includes(t.id), def = cfg.defaultTheme === t.id;
+        return `<div class="ad-theme ${on ? '' : 'off'} ${def ? 'def' : ''}" data-id="${t.id}">
+          <div class="ad-prev" style="background:${t.bg}"><i style="background:${t.fg}"></i><i style="background:${t.fg}"></i><i style="background:${t.ac}"></i></div>
+          <div class="ad-theme-b">
+            <div class="ad-theme-t"><span>${t.name}</span>${def ? '<span class="ad-tag">Default</span>' : ''}</div>
+            <p class="ad-sub" style="margin:0">${t.note}</p>
+            <div class="ad-theme-a">
+              <label class="ad-sw" title="${on ? 'Enabled' : 'Disabled'}"><input type="checkbox" data-en ${on ? 'checked' : ''} aria-label="Enable ${t.name}" /><span></span></label>
+              <button type="button" class="ad-btn ghost sm" data-def ${def || !on ? 'disabled' : ''}>${def ? 'Default' : 'Make default'}</button>
+            </div></div></div>`;
+      }).join('');
+    }
+    tbox.addEventListener('change', (e) => {
+      const el = e.target as HTMLInputElement; if (!el.matches('[data-en]')) return;
+      const id = el.closest<HTMLElement>('.ad-theme')!.dataset.id!;
+      if (!el.checked && cfg.enabled.length === 1) { el.checked = true; return note('At least one theme must stay enabled.', 'err'); }
+      cfg.enabled = el.checked ? THEMES.map((t) => t.id).filter((x) => x === id || cfg.enabled.includes(x)) : cfg.enabled.filter((x) => x !== id);
+      if (!cfg.enabled.includes(cfg.defaultTheme)) cfg.defaultTheme = cfg.enabled[0];
+      note(''); renderThemes();
+    });
+    tbox.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-def]'); if (!b || b.disabled) return;
+      cfg.defaultTheme = b.closest<HTMLElement>('.ad-theme')!.dataset.id!; note(''); renderThemes();
+    });
+
+    // ---- Security ----
+    const pwForm = $<HTMLFormElement>('#f-pw')!, pwMsg = $('#pw-msg')!, meter = $('#meter')!;
+    const strength = (p: string) => Math.min(4, (p.length >= 8 ? 1 : 0) + (p.length >= 12 ? 1 : 0) + (/[A-Z]/.test(p) && /[a-z]/.test(p) ? 1 : 0) + (/\d/.test(p) && /[^A-Za-z0-9]/.test(p) ? 1 : 0));
+    pwForm.addEventListener('input', () => { const s = strength((pwForm.elements.namedItem('next') as HTMLInputElement).value); meter.style.width = s * 25 + '%'; meter.style.background = ['#d92d20', '#d92d20', '#f79009', '#12b76a', '#138808'][s]; });
+    pwForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const g = (n: string) => (pwForm.elements.namedItem(n) as HTMLInputElement).value;
+      const m = (t: string, k = '') => { pwMsg.textContent = t; pwMsg.className = 'ad-msg ' + k; };
+      if (g('next') !== g('again')) return m('The two new passwords do not match.', 'err');
+      m('Updating…');
+      const r = await post('/api/admin/password', { current: g('current'), next: g('next') });
+      if (r.ok) { m('Password updated. You stay signed in on this device.', 'ok'); pwForm.reset(); meter.style.width = '0'; } else m(r.j.error || 'Could not update.', 'err');
+    });
+
+    // ---- Save (About or Appearance) ----
     $('#save')!.addEventListener('click', async () => {
-      collect(); setMsg('Saving…');
-      const r = await fetch('/api/admin/about', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-      const j = await r.json().catch(() => ({}));
-      setMsg(r.ok ? 'Saved. The About page is updated.' : j.error || 'Could not save.');
-      if (r.status === 401) setTimeout(() => location.reload(), 1200);
+      note('Saving…');
+      let r;
+      if (tab === 'look') r = await post('/api/admin/settings', cfg, 'PUT');
+      else { collect(); r = await post('/api/admin/about', about, 'PUT'); }
+      note(r.ok ? (tab === 'look' ? 'Saved. Visitors will see the new theme options shortly.' : 'Saved. The About page is updated.') : r.j.error || 'Could not save.', r.ok ? 'ok' : 'err');
+      if (r.status === 401) setTimeout(() => (location.href = '/admin'), 1200);
     });
 
-    fetch('/api/admin/about').then((r) => r.json()).then((d) => { data = d; render(); }).catch(() => (box.textContent = 'Could not load the content.'));
+    fetch('/api/admin/about').then((r) => r.json()).then((d) => { about = d; renderAbout(); }).catch(() => (box.textContent = 'Could not load the content.'));
+    fetch('/api/admin/settings').then((r) => r.json()).then((d) => { cfg = d; renderThemes(); }).catch(() => (tbox.textContent = 'Could not load the settings.'));
   }
 </script>

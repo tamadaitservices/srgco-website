@@ -1,20 +1,51 @@
-// Minimal password login for /admin. Disabled unless ADMIN_PASSWORD is set.
+// Admin sign-in: one administrator, identified by email + password.
+//  * First run: ADMIN_EMAIL and ADMIN_PASSWORD environment variables.
+//  * After the password is changed or reset in the panel, only a salted scrypt hash is kept
+//    in DATA_DIR/admin.json, and it takes over from the environment variable.
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { dataDir } from './about';
 
 const COOKIE = 'srg_admin';
 const TTL = 8 * 3600; // seconds
 
-export const adminEnabled = () => Boolean(process.env.ADMIN_PASSWORD);
-const secret = () => process.env.ADMIN_SECRET || `srg:${process.env.ADMIN_PASSWORD}`;
-const sign = (v: string) => crypto.createHmac('sha256', secret()).update(v).digest('hex');
-
-export function safeEqual(a: string, b: string) {
-  const ha = crypto.createHash('sha256').update(a).digest();
-  const hb = crypto.createHash('sha256').update(b).digest();
-  return crypto.timingSafeEqual(ha, hb);
+interface Stored { email: string; salt: string; hash: string }
+const file = () => path.join(dataDir(), 'admin.json');
+function stored(): Stored | null {
+  try { const j = JSON.parse(fs.readFileSync(file(), 'utf8')); return j?.hash && j?.salt ? j : null; } catch { return null; }
 }
 
-export const checkPassword = (p: string) => adminEnabled() && safeEqual(p, process.env.ADMIN_PASSWORD!);
+export const adminEmail = () => (stored()?.email || process.env.ADMIN_EMAIL || process.env.CONTACT_TO || '').trim().toLowerCase();
+export const adminEnabled = () => Boolean(stored() || process.env.ADMIN_PASSWORD);
+
+const scrypt = (pw: string, salt: string) => crypto.scryptSync(pw, salt, 64).toString('hex');
+const sha = (s: string) => crypto.createHash('sha256').update(s).digest();
+export const safeEqual = (a: string, b: string) => crypto.timingSafeEqual(sha(a), sha(b));
+
+// everything signed (sessions, reset links) depends on the current credentials, so changing the password signs everyone out
+const credFingerprint = () => { const s = stored(); return s ? s.hash : `env:${process.env.ADMIN_PASSWORD || ''}`; };
+const secret = () => `${process.env.ADMIN_SECRET || 'srg'}|${credFingerprint()}`;
+const sign = (v: string) => crypto.createHmac('sha256', secret()).update(v).digest('hex');
+
+export function checkLogin(email: string, password: string) {
+  if (!adminEnabled()) return false;
+  const okEmail = safeEqual(email.trim().toLowerCase(), adminEmail());
+  const s = stored();
+  const okPw = s ? safeEqual(scrypt(password, s.salt), s.hash) : safeEqual(password, process.env.ADMIN_PASSWORD || '');
+  return okEmail && okPw; // evaluate both to keep timing even
+}
+export const checkPassword = (password: string) => {
+  const s = stored();
+  return s ? safeEqual(scrypt(password, s.salt), s.hash) : adminEnabled() && safeEqual(password, process.env.ADMIN_PASSWORD || '');
+};
+
+export function setPassword(password: string) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  fs.mkdirSync(dataDir(), { recursive: true });
+  fs.writeFileSync(file(), JSON.stringify({ email: adminEmail(), salt, hash: scrypt(password, salt) }), { mode: 0o600 });
+}
+export const passwordProblem = (p: string) => (p.length < 8 ? 'Use at least 8 characters.' : p.length > 128 ? 'That password is too long.' : null);
 
 export function sessionCookie() {
   const exp = String(Math.floor(Date.now() / 1000) + TTL);
@@ -32,7 +63,14 @@ export function isAuthed(request: Request) {
   return safeEqual(sig, sign(exp));
 }
 
-/** Reject cross-site form posts: the Origin header (when present) must match the Host. */
+/** One-time password-reset link token: valid 30 minutes, dies as soon as the password changes. */
+export const resetToken = () => { const exp = String(Math.floor(Date.now() / 1000) + 1800); return `${exp}.${sign('reset:' + exp)}`; };
+export function validResetToken(t: string) {
+  const [exp, sig] = String(t || '').split('.');
+  return Boolean(exp && sig && Number(exp) > Date.now() / 1000 && safeEqual(sig, sign('reset:' + exp)));
+}
+
+/** Reject cross-site posts: the Origin header (when present) must match the Host. */
 export function sameOrigin(request: Request) {
   const o = request.headers.get('origin');
   if (!o) return true;

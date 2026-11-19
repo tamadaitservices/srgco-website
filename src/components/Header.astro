@@ -72,6 +72,7 @@ const themes = [
     if (popDot) popDot.className = 'dot ' + (dotClass[root.dataset.theme || 'navy'] || 'd-navy');
   };
   sync();
+  document.addEventListener('srg:theme', sync);
 
   function setTheme(next: string, origin: HTMLElement) {
     if (next === root.dataset.theme) return;

@@ -1,0 +1,30 @@
+---
+// Tricolour flag with a gentle ripple and a spinning Ashoka chakra (24 spokes). Decorative.
+const spokes = Array.from({ length: 24 }, (_, i) => i * 15);
+---
+<svg class="ad-flag" viewBox="0 0 360 240" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="ad-ripple" x="-5%" y="-10%" width="110%" height="120%">
+      <feTurbulence type="turbulence" baseFrequency="0.006 0.018" numOctaves="1" seed="3" result="t">
+        <animate attributeName="baseFrequency" dur="7s" values="0.006 0.018;0.009 0.026;0.006 0.018" repeatCount="indefinite" />
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="t" scale="14" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+    <linearGradient id="ad-shade" x1="0" x2="1">
+      <stop offset="0" stop-color="#000" stop-opacity=".18" /><stop offset=".5" stop-color="#fff" stop-opacity=".12" /><stop offset="1" stop-color="#000" stop-opacity=".2" />
+    </linearGradient>
+  </defs>
+  <g filter="url(#ad-ripple)">
+    <rect x="10" y="10" width="340" height="80" fill="#FF9933" />
+    <rect x="10" y="90" width="340" height="60" fill="#FFFFFF" />
+    <rect x="10" y="150" width="340" height="80" fill="#138808" />
+    <rect x="10" y="10" width="340" height="220" fill="url(#ad-shade)" />
+    <g class="ad-chakra" transform="translate(180 120)">
+      <circle r="25" fill="none" stroke="#000080" stroke-width="2.6" />
+      <circle r="4" fill="#000080" />
+      {spokes.map((a) => <line x1="0" y1="-5" x2="0" y2="-24" stroke="#000080" stroke-width="1.3" transform={`rotate(${a})`} />)}
+      {spokes.map((a) => <circle cx="0" cy="-23" r="1.5" fill="#000080" transform={`rotate(${a + 7.5})`} />)}
+    </g>
+  </g>
+  <rect x="2" y="2" width="6" height="236" rx="3" fill="#6b4a2b" />
+</svg>

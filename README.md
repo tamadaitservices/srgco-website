@@ -68,15 +68,15 @@ All firm content (services, team, offices, enquiry types) lives in `src/data/sit
 - Review the per-service "documents to keep ready" lists in `src/data/site.ts` with the client.
 
 
-## Admin panel (edit the About page)
+## Admin console
 
-Open `/admin` and sign in with the password set in the `ADMIN_PASSWORD` environment variable. From there the client can edit
-the About page text, founders and partners (with photos), gallery photos, the legacy timeline, core values and promise.
-If `ADMIN_PASSWORD` is not set the admin is switched off.
+Open `/admin`. It has its own tricolour-themed sign-in and dashboard, separate from the public site.
 
-* Edited content is saved as `about.json` and uploaded photos in `uploads/`, inside `DATA_DIR` (default: `./data` next to the app).
-* **Set `DATA_DIR` to a folder outside the app folder** (for example `/home/<user>/srg-data`) so a re-deploy never erases the client's edits.
-* The About page is rendered on request, so changes show immediately after pressing Save.
+* **Sign-in:** the email in `ADMIN_EMAIL` and the password in `ADMIN_PASSWORD` (environment variables). If `ADMIN_PASSWORD` is empty the admin is switched off.
+* **About page:** edit text, founders and partners (with photos), gallery, timeline, values and promise. Changes show immediately.
+* **Appearance:** turn each colour theme on or off in the website's theme switcher, and choose the default theme for new visitors (at least one theme always stays on).
+* **Security:** change the password (needs the current one). "Forgot password?" on the sign-in page emails a 30-minute reset link to the admin email (needs the SMTP settings). Once the password is changed or reset, only a salted hash is kept in `DATA_DIR/admin.json` and it replaces `ADMIN_PASSWORD`.
+* **Storage:** edited content, settings, photos and the password hash live in `DATA_DIR` (default `./data`). **Set `DATA_DIR` to a folder outside the app folder** (for example `/home/<user>/srg-data`) so a re-deploy never erases them.
 
 ## Notes: banners and PDFs
 

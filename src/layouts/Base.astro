@@ -63,14 +63,39 @@ const ld = [orgLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []
     <meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#121722" media="(prefers-color-scheme: dark)" />
     <script is:inline>
-      // Set theme before first paint (no flash). Saved choice wins; first-time visitors get the Navy & Copper design.
+      // Set theme before first paint (no flash). A visitor's saved choice wins if that theme is still enabled;
+      // otherwise the default chosen in /admin (Navy & Copper until changed) is used.
       (function () {
-        var t = null;
-        try { t = localStorage.getItem('srg-theme'); } catch (e) {}
-        if (t !== 'dark' && t !== 'light' && t !== 'emerald' && t !== 'navy' && t !== 'clean') t = 'navy';
-        document.documentElement.dataset.theme = t;
+        var ALL = ['clean', 'navy', 'light', 'dark', 'emerald'];
+        var root = document.documentElement;
+        function cfg() {
+          var c = null; try { c = JSON.parse(localStorage.getItem('srg-cfg')); } catch (e) {}
+          var en = (c && c.enabled || []).filter(function (x) { return ALL.indexOf(x) > -1; });
+          if (!en.length) en = ALL.slice();
+          var d = c && en.indexOf(c.def) > -1 ? c.def : en.indexOf('navy') > -1 ? 'navy' : en[0];
+          return { enabled: en, def: d };
+        }
+        function apply() {
+          var c = cfg(), saved = null;
+          try { saved = localStorage.getItem('srg-theme'); } catch (e) {}
+          var t = saved && c.enabled.indexOf(saved) > -1 ? saved : c.def;
+          if (root.dataset.theme !== t) { root.dataset.theme = t; document.dispatchEvent(new Event('srg:theme')); }
+          var css = ALL.filter(function (x) { return c.enabled.indexOf(x) < 0; }).map(function (x) { return '[data-theme-choice="' + x + '"]{display:none!important}'; }).join('');
+          if (c.enabled.length < 2) css += '#theme-switch,#theme-pop{display:none!important}';
+          var st = document.getElementById('srg-theme-css');
+          if (!st) { st = document.createElement('style'); st.id = 'srg-theme-css'; document.head.appendChild(st); }
+          st.textContent = css;
+        }
+        apply();
+        try {
+          fetch('/api/site-settings').then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+            if (!j || !j.enabled) return;
+            try { localStorage.setItem('srg-cfg', JSON.stringify(j)); } catch (e) {}
+            apply();
+          }).catch(function () {});
+        } catch (e) {}
         var l = null; try { l = localStorage.getItem('srg-lang'); } catch (e) {}
-        if (l === 'te' || l === 'hi') { document.documentElement.dataset.lang = l; document.documentElement.lang = l; }
+        if (l === 'te' || l === 'hi') { root.dataset.lang = l; root.lang = l; }
       })();
     </script>
 
