@@ -248,3 +248,17 @@ textarea.ad-in { resize: vertical; line-height: 1.5; }
 .ad-sw input:focus-visible + span { outline: 3px solid rgba(29, 63, 191, 0.3); outline-offset: 2px; }
 .ad-occ b { display: block; }
 .ad-occ > div > span { display: block; margin-top: 0.2rem; }
+
+/* sidebar shortcuts + tip, and a wider content area */
+.ad-short { margin-top: 1.6rem; display: grid; gap: 0.1rem; }
+.ad-nav-lab2 { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #98a2b3; margin: 0 0.8rem 0.4rem; }
+.ad .ad-short a { display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0.8rem; border-radius: 8px; color: #475467; text-decoration: none; font-size: 0.9rem; }
+.ad .ad-short a:hover { background: #f2f4f7; color: var(--d-text); }
+.ad-short i { font-style: normal; color: #98a2b3; font-size: 0.8rem; }
+.ad-tip { margin: 1.2rem 0.2rem 0; padding: 0.9rem 1rem; border-radius: 10px; background: #fffaeb; border: 1px solid #fedf89; display: grid; gap: 0.25rem; font-size: 0.82rem; line-height: 1.5; color: #7a5200; }
+.ad-tip b:first-child { font-size: 0.78rem; letter-spacing: 0.04em; text-transform: uppercase; color: #b54708; }
+.ad-head, .ad-content { max-width: 76rem; }
+.ad-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.ad-themes { grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); }
+@media (max-width: 1100px) { .ad-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 960px) { .ad-short, .ad-tip { display: none; } }
