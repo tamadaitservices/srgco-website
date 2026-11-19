@@ -2,7 +2,8 @@
 import ToolLayout from '../layouts/ToolLayout.astro';
 import Mascot from '../components/Mascot.astro';
 import { HEALTH_QUESTIONS, OPTIONS } from '../data/health';
-import { services } from '../data/site';
+import { getServices } from '../lib/content';
+const services = getServices();
 const svc = Object.fromEntries(services.map((s) => [s.slug, s.title]));
 ---
 <ToolLayout
@@ -106,7 +107,7 @@ const svc = Object.fromEntries(services.map((s) => [s.slug, s.title]));
       const summary = `Compliance health check: ${pct}% (${b.name}). ` + (weak.length ? 'Areas to review: ' + weak.map((q) => q.area).join(', ') + '.' : 'No weak areas.');
       try {
         const res = await fetch('/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic: 'Compliance health check', name, phone, email, message: summary, page: '/health-check', website: f.get('website') }) });
-        msg.textContent = res.ok ? 'Thank you — our team will call you shortly.' : 'Sorry, we could not send that just now. Please call 040-66462292.';
+        msg.textContent = res.ok ? 'Thank you — our team will call you shortly.' : 'Sorry, we could not send that just now. Please call ' + (document.body.dataset.phone || 'us') + '.';
         if (res.ok) { form.reset(); mood(owl, 'celebrate'); }
       } catch { msg.textContent = 'Network problem. Please try again.'; }
     });

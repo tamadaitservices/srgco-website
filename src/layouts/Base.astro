@@ -5,7 +5,10 @@ import Footer from '../components/Footer.astro';
 import ChatWidget from '../components/ChatWidget.astro';
 import Motion from '../components/Motion.astro';
 import Lang from '../components/Lang.astro';
-import { firm, offices } from '../data/site';
+import { firm } from '../data/site';
+import { getOffices, mainPhone } from '../lib/content';
+const offices = getOffices();
+const main = mainPhone();
 
 interface Props {
   title: string;
@@ -36,7 +39,7 @@ const orgLd = {
     .map((o) => ({
       '@type': 'AccountingService',
       name: `${firm.name} — ${o.city}`,
-      telephone: o.telHref,
+      telephone: o.telHref || undefined,
       email: o.email,
       address: {
         '@type': 'PostalAddress',
@@ -117,7 +120,7 @@ const ld = [orgLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : []
 
     {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
   </head>
-  <body>
+  <body data-phone={main.tel} data-phone-href={main.href}>
     <a class="skip" href="#main">Skip to content</a>
     <Header />
     <main id="main"><slot /></main>

@@ -1,8 +1,11 @@
 ---
-import { firm, offices, services } from '../data/site';
+import { firm } from '../data/site';
+import { getOffices, getServices, mapLinks, telHref as telHrefOf } from '../lib/content';
+const offices = getOffices();
+const services = getServices();
 ---
 <footer class="mt-28 border-t-[3px] border-double border-ink bg-paper-deep/70">
-  <div class="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-4">
+  <div class="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-[1fr_1.1fr_2fr]">
     <div>
       <p class="brand font-serif text-2xl font-semibold text-pen">{firm.name},</p>
       <p class="label mt-1">Chartered Accountants · Est. {firm.established}</p>
@@ -14,25 +17,25 @@ import { firm, offices, services } from '../data/site';
         {services.map((s) => <li><a class="link" href={`/services/${s.slug}`}>{s.title}</a></li>)}
       </ul>
     </div>
+    <div class="footer-offices">
     {offices.filter((o) => o.primary).map((o) => (
       <div>
         <p class="label mb-3">{o.city} office</p>
         <address class="footer-addr text-base not-italic">
           {o.address?.map((l) => <span class="block">{l}</span>)}
           <span class="block">{o.city} – {o.postal}</span>
-          <a class="link mt-3 block" href={`tel:${o.telHref}`}>{o.tel}</a>
-          <a class="mail-btn" href={`mailto:${o.email}`}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> Email us</a>
+          {o.phones.map((p, i) => <a class={`link block ${i === 0 ? "mt-3" : ""}`} href={`tel:${telHrefOf(p)}`}>{p}</a>)}
+          {o.email && <a class="mail-btn" href={`mailto:${o.email}`}><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg> Email us</a>}
+          <a class="mail-btn" href={mapLinks(o).open} target="_blank" rel="noopener noreferrer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6-7-11a7 7 0 0114 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> View on map</a>
         </address>
       </div>
     ))}
+    </div>
   </div>
   <div class="mx-auto max-w-6xl border-t border-rule px-5 py-6">
     <p class="label footer-serving">
       <span class="serving-lab">Serving:</span>
-      <a class="link" href="/chartered-accountants-hyderabad">Hyderabad</a> ·
-      <a class="link" href="/chartered-accountants-vijayawada">Vijayawada</a> ·
-      <a class="link" href="/chartered-accountants-rajahmundry">Rajahmundry</a> ·
-      <a class="link" href="/chartered-accountants-kakinada">Kakinada</a>
+      {offices.map((o, i) => <><a class="link" href={`/chartered-accountants-${o.slug}`}>{o.city}</a>{i < offices.length - 1 ? ' · ' : ''}</>)}
     </p>
     <p class="label mt-3">
       <a class="link" href="/team">Team</a> · <a class="link" href="/tools">Tools</a> · <a class="link" href="/compliance-calendar">Compliance calendar</a> · <a class="link" href="/health-check">Health check</a> · <a class="link" href="/book">Book a call</a> · <a class="link" href="/insights">Notes</a>

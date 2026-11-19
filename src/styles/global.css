@@ -1715,3 +1715,7 @@ html[data-lang='te'] em, html[data-lang='hi'] em { font-style: normal; }
 /* hero highlight colour per occasion theme */
 :root[data-theme='republic'] .cl-hero h1 em, :root[data-theme='independence'] .cl-hero h1 em { color: #ffb15c; }
 :root[data-theme='gandhi'] .cl-hero h1 em { color: #f0c777; }
+
+/* footer: offices sit side by side and wrap */
+.footer-offices { display: grid; gap: 2rem 2.5rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
+.footer-offices .mail-btn { margin-right: 0.4rem; }

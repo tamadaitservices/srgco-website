@@ -1,17 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
-import { offices } from '../data/site';
+import { getOffices, mapLinks } from '../lib/content';
 import { loadAbout } from '../lib/about';
 
 // Rendered on request so edits made in /admin appear immediately.
 export const prerender = false;
 const a = loadAbout();
 const initials = (n: string) => n.replace(/^(Late|Sri|Mr|Ms|Dr)\.?\s+/i, '').split(/[\s.]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
-const places = offices.filter((o) => o.primary).map((o) => {
-  const q = [...(o.address ?? []), `${o.city} ${o.postal ?? ''}`, 'India'].join(', ');
-  const enc = encodeURIComponent(`S.R. Garimella & Co., ${q}`);
-  return { city: o.city, q, embed: `https://maps.google.com/maps?q=${enc}&z=16&output=embed`, open: `https://www.google.com/maps/search/?api=1&query=${enc}`, dir: `https://www.google.com/maps/dir/?api=1&destination=${enc}`, address: [...(o.address ?? []), `${o.city} – ${o.postal}`] };
-});
+const places = getOffices().filter((o) => o.primary && (o.address.length || o.lat != null)).map((o) => ({ city: o.city, ...mapLinks(o), address: [...o.address, `${o.city}${o.postal ? ' – ' + o.postal : ''}`], phones: o.phones }));
 ---
 <Base title="About" description="Learn about S.R. Garimella & Co., Chartered Accountants established in 1989 — our founders, our firm, approach, legacy and core values.">
   <section class="ledger">
@@ -69,6 +65,7 @@ const places = offices.filter((o) => o.primary).map((o) => {
       <ol class="mt-6">{a.promises.map((p, i) => <li class="flex gap-3 border-b border-rule py-2 text-lg"><span class="num text-sm text-stamp">{String(i + 1).padStart(2, '0')}</span>{p}</li>)}</ol></div>
   </section>
 
+  {places.length > 0 && (
   <section class="mx-auto max-w-5xl px-5 pt-20" aria-labelledby="map-h" id="map">
     <p class="label">Find us</p>
     <h2 id="map-h" class="mt-2">Our offices on the map</h2>
@@ -81,7 +78,7 @@ const places = offices.filter((o) => o.primary).map((o) => {
           <iframe title={`Map of our ${p.city} office`} data-src={p.embed} src={i === 0 ? p.embed : undefined} loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
         </div>
         <div class="map-info">
-          <address class="not-italic text-lg">{p.address.map((l) => <span class="block">{l}</span>)}</address>
+          <address class="not-italic text-lg">{p.address.map((l) => <span class="block">{l}</span>)}{p.phones.map((t) => <span class="block">{t}</span>)}</address>
           <div class="map-actions">
             <a class="mail-btn" href={p.dir} target="_blank" rel="noopener noreferrer">Get directions</a>
             <a class="mail-btn" href={p.open} target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
@@ -90,6 +87,7 @@ const places = offices.filter((o) => o.primary).map((o) => {
       </div>
     ))}
   </section>
+  )}
 </Base>
 
 <script>

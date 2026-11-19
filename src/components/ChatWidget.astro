@@ -1,6 +1,8 @@
 ---
 import Mascot from './Mascot.astro';
-import { services, firm } from '../data/site';
+import { firm } from '../data/site';
+import { getServices } from '../lib/content';
+const services = getServices();
 const topics = [...services.map((s) => s.title), 'Something else'];
 const wa = (import.meta.env.PUBLIC_WHATSAPP || (import.meta.env.DEV ? '910000000000' : '')).replace(/\D/g, '');
 const waText = encodeURIComponent(`Hello ${firm.name}, I would like to enquire about your services.`);

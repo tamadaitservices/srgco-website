@@ -1,12 +1,11 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
-import { services } from '../../data/site';
+import { getServices } from '../../lib/content';
 
-export function getStaticPaths() {
-  return services.map((s) => ({ params: { slug: s.slug }, props: { s } }));
-}
-const { s } = Astro.props;
+const services = getServices();
+const s = services.find((x) => x.slug === Astro.params.slug);
+if (!s) return Astro.rewrite('/404');
 const ld = [
   { '@context': 'https://schema.org', '@type': 'Service', name: s.title, description: s.seoDescription, provider: { '@type': 'AccountingService', name: 'S.R. Garimella & Co.' }, areaServed: ['Hyderabad', 'Vijayawada', 'India'] },
   { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [

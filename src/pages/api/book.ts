@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { clean, json, mailConfigured, rateLimited, sendMail } from '../../lib/mail';
 import { buildIcs } from '../../lib/ics';
 import { BOOKING, slotsOn, toUtc, fmtDay, fmtTime } from '../../data/booking';
-import { offices } from '../../data/site';
+import { getBookingModes, getOffices } from '../../lib/content';
 
 export const prerender = false;
 
@@ -15,7 +15,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (clean(b.website, 50)) return json({ ok: true }); // honeypot
 
   const date = clean(b.date, 10), time = clean(b.time, 5);
-  const mode = BOOKING.modes.find((m) => m.id === clean(b.mode, 20));
+  const mode = getBookingModes().find((m) => m.id === clean(b.mode, 20));
   const name = clean(b.name, 120), phone = clean(b.phone, 30), email = clean(b.email, 160);
   const topic = clean(b.topic, 120) || 'General discussion', note = clean(b.note, 800);
   const digits = phone.replace(/\D/g, '');
@@ -28,7 +28,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   const start = toUtc(date, time);
   const end = new Date(start.getTime() + BOOKING.slotMinutes * 60000);
-  const office = offices.find((o) => o.slug === mode.id);
+  const office = getOffices().find((o) => o.slug === mode.id);
   const location = office ? `${office.city} office — ${(office.address || []).join(', ')}, ${office.postal}` : mode.id === 'phone' ? `Phone call — ${phone}` : 'Video call (link to be shared)';
   const when = `${fmtDay(date)} at ${fmtTime(time)} IST`;
   const organizer = process.env.SMTP_USER!;

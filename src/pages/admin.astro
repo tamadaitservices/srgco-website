@@ -83,6 +83,8 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
         <nav class="ad-nav" role="tablist" aria-label="Admin sections">
           <button role="tab" aria-selected="true" data-tab="home"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" /></svg></span>Overview</button>
           <button role="tab" aria-selected="false" data-tab="about"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5" /></svg></span>About page</button>
+          <button role="tab" aria-selected="false" data-tab="offices"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6-7-11a7 7 0 0114 0c0 5-7 11-7 11zM12 7.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z" /></svg></span>Offices &amp; phones</button>
+          <button role="tab" aria-selected="false" data-tab="services"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h18v12H3zM8 8V5h8v3M3 13h18" /></svg></span>Services</button>
           <button role="tab" aria-selected="false" data-tab="look"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 100 18c1.5 0 2-1 1.5-2s0-2 1.5-2h2A4 4 0 0021 10c0-4-4-7-9-7zM7.5 11h.01M10 7.5h.01M14 7.5h.01" /></svg></span>Appearance</button>
           <button role="tab" aria-selected="false" data-tab="security"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" /><path d="M9 12l2 2 4-4" /></svg></span>Security</button>
         </nav>
@@ -114,6 +116,8 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
             <h2 class="ad-h2">Quick actions</h2>
             <div class="ad-quick">
               <button type="button" class="ad-q" data-goto="about"><b>Edit About page <i>→</i></b><span>Founders, photos, timeline, values and promise.</span></button>
+              <button type="button" class="ad-q" data-goto="offices"><b>Offices &amp; phones <i>→</i></b><span>Addresses, mobile numbers and map locations.</span></button>
+              <button type="button" class="ad-q" data-goto="services"><b>Services <i>→</i></b><span>Add, edit or reorder your services.</span></button>
               <button type="button" class="ad-q" data-goto="look"><b>Manage themes <i>→</i></b><span>Turn themes on or off and pick the default.</span></button>
               <button type="button" class="ad-q" data-goto="security"><b>Change password <i>→</i></b><span>Keep your admin account safe.</span></button>
             </div>
@@ -124,6 +128,16 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
           <section class="ad-view" data-panel="about" hidden>
             <p class="ad-lead">Edit what visitors see on the About page. Changes go live when you press Save.</p>
             <div id="about-fields"><p class="ad-lead">Loading…</p></div>
+          </section>
+
+          <section class="ad-view" data-panel="offices" hidden>
+            <p class="ad-lead">Edit each office's address, phone numbers, email and map location. These appear in the footer, contact page, home page, About page map and each city page.</p>
+            <div id="office-fields"><p class="ad-lead">Loading…</p></div>
+          </section>
+
+          <section class="ad-view" data-panel="services" hidden>
+            <p class="ad-lead">Add, edit, reorder or remove services. Each service gets its own page on the website, and appears in the menu lists, footer and enquiry forms.</p>
+            <div id="service-fields"><p class="ad-lead">Loading…</p></div>
           </section>
 
           <section class="ad-view" data-panel="look" hidden>
@@ -225,7 +239,7 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       user: 'M16 20v-1a4 4 0 00-4-4H8a4 4 0 00-4 4v1M10 11a3 3 0 100-6 3 3 0 000 6M20 20v-1a3 3 0 00-2-2.8M16 5.2a3 3 0 010 5.6',
       img: 'M4 5h16v14H4zM4 15l4-4 4 4 3-3 5 5M9 9h.01', clock: 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 7v5l3 2', doc: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5',
       heart: 'M12 21s-7-4.5-9.3-9A5 5 0 0112 6a5 5 0 019.3 6C19 16.5 12 21 12 21z', pal: 'M12 3a9 9 0 100 18c1.5 0 2-1 1.5-2s0-2 1.5-2h2A4 4 0 0021 10c0-4-4-7-9-7zM7.5 11h.01M10 7.5h.01M14 7.5h.01',
-      plus: 'M12 5v14M5 12h14', trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3', eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6',
+      plus: 'M12 5v14M5 12h14', pin: 'M12 21s-7-6-7-11a7 7 0 0114 0c0 5-7 11-7 11zM12 7.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z', brief: 'M3 8h18v12H3zM8 8V5h8v3M3 13h18', trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3', eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6',
     };
     const toasts = $('#toasts')!;
     const note = (t: string, kind = '', ms = 3600) => {
@@ -244,7 +258,7 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
     addEventListener('beforeunload', (e) => { if (dirty) e.preventDefault(); });
 
     // ---- tabs ----
-    const TITLES: Record<string, string> = { home: 'Overview', about: 'About page', look: 'Appearance', security: 'Security' };
+    const TITLES: Record<string, string> = { home: 'Overview', about: 'About page', offices: 'Offices & phones', services: 'Services', look: 'Appearance', security: 'Security' };
     let tab = 'home';
     const tabs = Array.from(app.querySelectorAll<HTMLButtonElement>('[data-tab]'));
     const panels = Array.from(app.querySelectorAll<HTMLElement>('[data-panel]'));
@@ -253,7 +267,7 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
       panels.forEach((p) => { const on = p.dataset.panel === t; p.hidden = !on; if (on) { p.style.animation = 'none'; void p.offsetWidth; p.style.animation = ''; } });
       $('#title')!.textContent = TITLES[t]; $('#crumb')!.textContent = TITLES[t];
-      bar.classList.toggle('hide', !(t === 'about' || t === 'look'));
+      bar.classList.toggle('hide', !['about', 'look', 'offices', 'services'].includes(t));
       history.replaceState(null, '', '#' + t);
       scrollTo({ top: 0 });
       if (t === 'home') renderHome();
@@ -392,6 +406,131 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       cfg.defaultTheme = b.closest<HTMLElement>('.ad-theme')!.dataset.id!; setDirty(true); renderThemes();
     });
 
+
+    // ---- Offices & Services ----
+    type Office = { slug: string; city: string; region: string; primary: boolean; address: string[]; postal: string; phones: string[]; email: string; mapLink: string; lat: number | null; lng: number | null };
+    type Group = { heading: string; items: string[] };
+    type Service = { slug: string; title: string; short: string; icon: string; seoTitle: string; seoDescription: string; intro: string; groups: Group[] };
+    let offices: Office[] = [], services: Service[] = [], icons: string[] = [];
+    const obox = $('#office-fields')!, sbox = $('#service-fields')!;
+    const lines = (v: string) => v.split('\n').map((x) => x.trim()).filter(Boolean);
+    const mapHref = (o: Office) => o.mapLink || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(o.lat != null && o.lng != null ? `${o.lat},${o.lng}` : [...o.address, o.city, o.postal, 'India'].join(', '))}`;
+
+    function renderOffices() {
+      obox.innerHTML = offices.map((o, i) => `
+        <div class="ad-sec" data-i="${i}">
+          <h3><span class="ad-ico">${ic('M12 21s-7-6-7-11a7 7 0 0114 0c0 5-7 11-7 11zM12 7.5a2.5 2.5 0 100 5 2.5 2.5 0 000-5z')}</span>${esc(o.city || 'New office')}</h3>
+          <p class="ad-hint">${o.primary ? 'Shown with its full address on the website.' : 'Listed by name only (for example “also serving”).'}</p>
+          <div class="ad-two">
+            <label class="ad-field"><span>City</span><input class="ad-in" data-o="city" value="${esc(o.city)}" /></label>
+            <label class="ad-field"><span>State / region</span><input class="ad-in" data-o="region" value="${esc(o.region)}" /></label>
+          </div>
+          <label class="ad-field"><span>Address (one line per row)</span><textarea class="ad-in" rows="3" data-o="address" placeholder="Building / floor&#10;Street, area">${esc(o.address.join('\n'))}</textarea></label>
+          <div class="ad-two">
+            <label class="ad-field"><span>PIN code</span><input class="ad-in" data-o="postal" value="${esc(o.postal)}" inputmode="numeric" /></label>
+            <label class="ad-field"><span>Email</span><input class="ad-in" data-o="email" type="email" value="${esc(o.email)}" placeholder="name@srgco.in" /></label>
+          </div>
+          <label class="ad-field"><span>Phone / mobile numbers (one per line)</span><textarea class="ad-in" rows="3" data-o="phones" placeholder="040-66462292&#10;98480 12345">${esc(o.phones.join('\n'))}</textarea></label>
+          <p class="ad-hint" style="margin-left:0">Numbers become tap-to-call links. Landlines can be written like 040-66462292; mobiles like 98480 12345.</p>
+          <h3 style="margin-top:1.3rem"><span class="ad-ico">${ic(I.pin)}</span>Map location</h3>
+          <p class="ad-hint">By default the map is found from the address above. For an exact pin, add the coordinates or a Google Maps link.</p>
+          <div class="ad-two">
+            <label class="ad-field"><span>Latitude (optional)</span><input class="ad-in" data-o="lat" inputmode="decimal" value="${o.lat ?? ''}" placeholder="17.3994" /></label>
+            <label class="ad-field"><span>Longitude (optional)</span><input class="ad-in" data-o="lng" inputmode="decimal" value="${o.lng ?? ''}" placeholder="78.4861" /></label>
+          </div>
+          <label class="ad-field"><span>Google Maps link (optional, used for “Get directions”)</span><input class="ad-in" data-o="mapLink" value="${esc(o.mapLink)}" placeholder="https://maps.app.goo.gl/…" /></label>
+          <div class="ad-row2">
+            <label class="ad-chk"><input type="checkbox" data-o="primary" ${o.primary ? 'checked' : ''} /> Show full address on the website</label>
+            <a class="ad-btn ghost sm" href="${esc(mapHref(o))}" target="_blank" rel="noopener">Check map ↗</a>
+          </div>
+          <div class="ad-act">
+            <button type="button" class="ad-btn ghost sm" data-oact="up" ${i === 0 ? 'disabled' : ''}>↑ Move up</button>
+            <button type="button" class="ad-btn ghost sm" data-oact="down" ${i === offices.length - 1 ? 'disabled' : ''}>↓ Move down</button>
+            <button type="button" class="ad-btn danger sm" data-oact="del">Remove office</button>
+          </div>
+        </div>`).join('') + '<button type="button" class="ad-add" data-oact="add">+ Add an office</button>';
+    }
+    function collectOffices() {
+      obox.querySelectorAll<HTMLElement>('.ad-sec[data-i]').forEach((card) => {
+        const o = offices[Number(card.dataset.i)];
+        card.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[data-o]').forEach((el) => {
+          const k = el.dataset.o!;
+          if (k === 'address') o.address = lines(el.value);
+          else if (k === 'phones') o.phones = lines(el.value);
+          else if (k === 'primary') o.primary = (el as HTMLInputElement).checked;
+          else if (k === 'lat' || k === 'lng') { const n = parseFloat(el.value); (o as any)[k] = Number.isFinite(n) ? n : null; }
+          else (o as any)[k] = el.value.trim();
+        });
+      });
+    }
+    obox.addEventListener('input', () => setDirty(true)); obox.addEventListener('change', () => setDirty(true));
+    obox.addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-oact]'); if (!t) return;
+      collectOffices();
+      const i = Number(t.closest<HTMLElement>('[data-i]')?.dataset.i);
+      const a = t.dataset.oact;
+      if (a === 'add') offices.push({ slug: '', city: '', region: '', primary: true, address: [], postal: '', phones: [], email: '', mapLink: '', lat: null, lng: null });
+      else if (a === 'del') { if (!confirm(`Remove the ${offices[i].city || 'new'} office? Its city page will no longer exist.`)) return; offices.splice(i, 1); }
+      else if (a === 'up' && i > 0) [offices[i - 1], offices[i]] = [offices[i], offices[i - 1]];
+      else if (a === 'down' && i < offices.length - 1) [offices[i + 1], offices[i]] = [offices[i], offices[i + 1]];
+      setDirty(true); renderOffices();
+    });
+
+    function renderServices() {
+      sbox.innerHTML = services.map((s, i) => `
+        <details class="ad-sec ad-svc" data-i="${i}">
+          <summary><span class="ad-ico">${ic(I.brief)}</span><b>${esc(s.title || 'New service')}</b><small>${s.slug ? '/services/' + esc(s.slug) : 'new'}</small></summary>
+          <div class="ad-two">
+            <label class="ad-field"><span>Service name</span><input class="ad-in" data-s="title" value="${esc(s.title)}" /></label>
+            <label class="ad-field"><span>Icon</span><select class="ad-in" data-s="icon">${icons.map((n) => `<option ${n === s.icon ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+          </div>
+          <label class="ad-field"><span>Short description (shown on cards and lists)</span><input class="ad-in" data-s="short" value="${esc(s.short)}" /></label>
+          <label class="ad-field"><span>Introduction (top of the service page)</span><textarea class="ad-in" rows="3" data-s="intro">${esc(s.intro)}</textarea></label>
+          <p class="ad-sub2">What we do</p>
+          ${s.groups.map((g, gi) => `
+            <div class="ad-grp" data-g="${gi}">
+              <div class="ad-trow2"><input class="ad-in" data-gh value="${esc(g.heading)}" placeholder="Heading, e.g. Core audit services" /><button type="button" class="ad-x" data-sact="delg" aria-label="Remove group">✕</button></div>
+              <textarea class="ad-in" rows="4" data-gi placeholder="One item per line">${esc(g.items.join('\n'))}</textarea>
+            </div>`).join('')}
+          <button type="button" class="ad-add" data-sact="addg">+ Add a heading</button>
+          <p class="ad-sub2">Search engines (optional)</p>
+          <label class="ad-field"><span>Page title</span><input class="ad-in" data-s="seoTitle" value="${esc(s.seoTitle)}" /></label>
+          <label class="ad-field"><span>Page description</span><textarea class="ad-in" rows="2" data-s="seoDescription">${esc(s.seoDescription)}</textarea></label>
+          <div class="ad-act">
+            <button type="button" class="ad-btn ghost sm" data-sact="up" ${i === 0 ? 'disabled' : ''}>↑ Move up</button>
+            <button type="button" class="ad-btn ghost sm" data-sact="down" ${i === services.length - 1 ? 'disabled' : ''}>↓ Move down</button>
+            ${s.slug ? `<a class="ad-btn ghost sm" href="/services/${esc(s.slug)}" target="_blank" rel="noopener">View page ↗</a>` : ''}
+            <button type="button" class="ad-btn danger sm" data-sact="del">Remove service</button>
+          </div>
+        </details>`).join('') + '<button type="button" class="ad-add" data-sact="add">+ Add a service</button>';
+    }
+    function collectServices() {
+      sbox.querySelectorAll<HTMLElement>('.ad-svc').forEach((card) => {
+        const s = services[Number(card.dataset.i)];
+        card.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>('[data-s]').forEach((el) => { (s as any)[el.dataset.s!] = el.value.trim(); });
+        s.groups = Array.from(card.querySelectorAll<HTMLElement>('.ad-grp')).map((g) => ({ heading: g.querySelector<HTMLInputElement>('[data-gh]')!.value.trim(), items: lines(g.querySelector<HTMLTextAreaElement>('[data-gi]')!.value) }));
+      });
+    }
+    sbox.addEventListener('input', () => setDirty(true)); sbox.addEventListener('change', () => setDirty(true));
+    sbox.addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-sact]'); if (!t) return;
+      const card = t.closest<HTMLDetailsElement>('.ad-svc');
+      const i = card ? Number(card.dataset.i) : -1;
+      const open = Array.from(sbox.querySelectorAll<HTMLDetailsElement>('.ad-svc')).map((d) => d.open);
+      collectServices();
+      const a = t.dataset.sact;
+      let focus = i;
+      if (a === 'add') { services.push({ slug: '', title: '', short: '', icon: 'briefcase', seoTitle: '', seoDescription: '', intro: '', groups: [{ heading: 'What we do', items: [] }] }); open.push(true); focus = services.length - 1; }
+      else if (a === 'del') { if (!confirm(`Remove “${services[i].title || 'this service'}”? Its page will no longer exist.`)) return; services.splice(i, 1); open.splice(i, 1); focus = -1; }
+      else if (a === 'up' && i > 0) { [services[i - 1], services[i]] = [services[i], services[i - 1]]; [open[i - 1], open[i]] = [open[i], open[i - 1]]; focus = i - 1; }
+      else if (a === 'down' && i < services.length - 1) { [services[i + 1], services[i]] = [services[i], services[i + 1]]; [open[i + 1], open[i]] = [open[i], open[i + 1]]; focus = i + 1; }
+      else if (a === 'addg') { services[i].groups.push({ heading: '', items: [] }); }
+      else if (a === 'delg') { const gi = Number(t.closest<HTMLElement>('.ad-grp')!.dataset.g); services[i].groups.splice(gi, 1); }
+      setDirty(true); renderServices();
+      sbox.querySelectorAll<HTMLDetailsElement>('.ad-svc').forEach((d, k) => { d.open = !!open[k]; });
+      if (focus >= 0) sbox.querySelectorAll<HTMLElement>('.ad-svc')[focus]?.scrollIntoView({ block: 'nearest' });
+    });
+
     // ---- Overview ----
     let health: { mail: boolean; storage: boolean; customStorage: boolean } | null = null;
     const h = new Date().getHours();
@@ -405,10 +544,10 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
     function renderHome() {
       const defName = THEMES.find((t) => t.id === cfg.defaultTheme)?.name ?? '';
       const cards = [
-        { c: 'c1', i: I.pal, n: cfg.enabled.length, sfx: ` / ${THEMES.length}`, l: 'Themes switched on' },
-        { c: 'c2', i: I.eye, text: defName, l: 'Default theme' },
-        { c: 'c3', i: I.user, n: about.founders.length, l: 'Founders & partners' },
-        { c: 'c4', i: I.img, n: about.photos.length, l: 'Gallery photos' },
+        { c: 'c1', i: I.brief, n: services.length, l: 'Services' },
+        { c: 'c2', i: I.pin, n: offices.length, l: 'Offices' },
+        { c: 'c3', i: I.pal, n: cfg.enabled.length, sfx: ` / ${THEMES.length}`, l: 'Themes switched on' },
+        { c: 'c4', i: I.eye, text: defName, l: 'Default theme' },
       ];
       $('#stats')!.innerHTML = cards.map((c, k) => `<div class="ad-stat ${c.c}" style="animation-delay:${k * 70}ms"><span class="si">${ic(c.i)}</span><b>${c.text ? esc(c.text) : `<em data-n="${c.n}" style="font-style:normal">0</em>${c.sfx ?? ''}`}</b><span>${c.l}</span></div>`).join('');
       $('#stats')!.querySelectorAll<HTMLElement>('[data-n]').forEach((el) => countUp(el, Number(el.dataset.n)));
@@ -442,19 +581,22 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       const btn = $<HTMLButtonElement>('#save')!; btn.disabled = true;
       let r;
       if (tab === 'look') r = await post('/api/admin/settings', cfg, 'PUT');
+      else if (tab === 'offices') { collectOffices(); r = await post('/api/admin/content', { offices }, 'PUT'); if (r.ok) { offices = r.j.offices; renderOffices(); } }
+      else if (tab === 'services') { collectServices(); r = await post('/api/admin/content', { services }, 'PUT'); if (r.ok) { services = r.j.services; renderServices(); } }
       else { collect(); r = await post('/api/admin/about', about, 'PUT'); }
       btn.disabled = false;
-      if (r.ok) { setDirty(false); note(tab === 'look' ? 'Saved. Visitors will see the new theme options shortly.' : 'Saved. The About page is updated.', 'ok'); }
+      if (r.ok) { setDirty(false); note(tab === 'look' ? 'Saved. Visitors will see the new theme options shortly.' : tab === 'about' ? 'Saved. The About page is updated.' : 'Saved. The website is updated.', 'ok'); }
       else note(r.j.error || 'Could not save.', 'err');
       if (r.status === 401) setTimeout(() => (location.href = '/admin'), 1200);
     });
 
     // ---- load data ----
-    go(['home', 'about', 'look', 'security'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home');
+    go(Object.keys(TITLES).includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home');
     Promise.all([
       fetch('/api/admin/about').then((r) => r.json()).then((d) => { about = d; renderAbout(); }).catch(() => (box.textContent = 'Could not load the content.')),
       fetch('/api/admin/settings').then((r) => r.json()).then((d) => { cfg = d; renderThemes(); }).catch(() => (tbox.textContent = 'Could not load the settings.')),
     ]).then(() => { if (tab === 'home') renderHome(); });
+    fetch('/api/admin/content').then((r) => r.json()).then((d) => { offices = d.offices; services = d.services; icons = d.icons; renderOffices(); renderServices(); if (tab === 'home') renderHome(); }).catch(() => { obox.textContent = 'Could not load.'; sbox.textContent = 'Could not load.'; });
     fetch('/api/admin/status').then((r) => r.json()).then((d) => { health = d; if (tab === 'home') renderHome(); }).catch(() => {});
   }
 </script>

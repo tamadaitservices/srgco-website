@@ -1,7 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import Icon from '../../components/Icon.astro';
-import { services } from '../../data/site';
+import { getServices } from '../../lib/content';
+const services = getServices();
 ---
 <Base title="Our Professional Services" description="Audit & assurance, tax advisory & litigation, international taxation, GST & customs, 100% EOU, corporate law, corporate finance and accounting outsourcing.">
   <section class="mx-auto max-w-5xl px-5 pt-14">

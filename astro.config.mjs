@@ -1,7 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import node from '@astrojs/node';
-import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
 
@@ -23,9 +22,9 @@ const site = resolveSite(process.env.PUBLIC_SITE_URL);
 // The Node adapter only serves them and runs the /api/contact endpoint.
 export default defineConfig({
   site,
-  output: 'static',
+  output: 'server', // pages are rendered on request so content edited in /admin shows immediately
   adapter: node({ mode: 'standalone' }),
-  integrations: [mdx(), sitemap({ customPages: [`${site}/about`], filter: (page) => !page.includes('/admin') })],
+  integrations: [mdx()],
   vite: { plugins: [tailwindcss()] },
   server: { host: true },
 });

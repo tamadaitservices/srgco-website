@@ -74,6 +74,8 @@ Open `/admin`. It has its own tricolour-themed sign-in and dashboard, separate f
 
 * **Sign-in:** the email in `ADMIN_EMAIL` and the password in `ADMIN_PASSWORD` (environment variables). If `ADMIN_PASSWORD` is empty the admin is switched off.
 * **About page:** edit text, founders and partners (with photos), gallery, timeline, values and promise. Changes show immediately.
+* **Offices & phones:** edit each office's city, address, PIN, phone/mobile numbers (several per office), email and map location (coordinates and/or a Google Maps link), add or remove offices, and choose which show their full address. These appear in the footer, contact page, home page, About-page map, city pages and booking options.
+* **Services:** add, edit, reorder or remove services (name, icon, description, headings and bullet items, search-engine title/description). Each service gets its own page automatically, and appears in the footer, lists, chat topics and enquiry forms.
 * **Appearance:** turn each colour theme on or off in the website's theme switcher, and choose the default theme for new visitors (at least one theme always stays on).
 * **Security:** change the password (needs the current one). "Forgot password?" on the sign-in page emails a 30-minute reset link to the admin email (needs the SMTP settings). Once the password is changed or reset, only a salted hash is kept in `DATA_DIR/admin.json` and it replaces `ADMIN_PASSWORD`.
 * **Storage:** edited content, settings, photos and the password hash live in `DATA_DIR` (default `./data`). **Set `DATA_DIR` to a folder outside the app folder** (for example `/home/<user>/srg-data`) so a re-deploy never erases them.
@@ -82,3 +84,9 @@ Open `/admin`. It has its own tricolour-themed sign-in and dashboard, separate f
 
 In a note's front matter, add optional `banner: /notes/my-banner.jpg` and `pdf: /notes/my-circular.pdf` (place the files in `public/notes/`).
 Without a banner, one is generated from the note's category. Every note has a "Save this note as PDF" button; notes with a `pdf` also get "View PDF" and "Download PDF".
+
+
+## How pages are built
+
+The site now runs in server mode (`output: 'server'`): every page is rendered on request, so anything saved in the admin shows immediately without a rebuild or redeploy.
+Offices and services come from `DATA_DIR/content.json` (falling back to the defaults in `src/data/site.ts` until something is saved). `/sitemap.xml` is generated on request from the same data.

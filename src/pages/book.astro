@@ -1,7 +1,10 @@
 ---
 import Base from '../layouts/Base.astro';
 import Mascot from '../components/Mascot.astro';
-import { enquiryTypes, offices } from '../data/site';
+import { getEnquiryTypes, getOffices, getBookingModes, mainPhone, telHref as telHrefOf } from '../lib/content';
+const enquiryTypes = getEnquiryTypes();
+const callable = getOffices().filter((o) => o.phones[0]);
+const main = mainPhone();
 import { BOOKING } from '../data/booking';
 const topics = enquiryTypes.map((t) => t.title);
 ---
@@ -12,9 +15,9 @@ const topics = enquiryTypes.map((t) => t.title);
     <p class="mt-5 max-w-3xl text-xl">Pick a topic, a day and a time. We will confirm your slot by phone or email. All times are Indian Standard Time (IST).</p>
     <div class="gari-row mt-6" aria-hidden="true"><Mascot mood="wave" size="5rem" follow class="gari-book" /><p class="gari-bubble left" id="gari-say">Hi! I'm Gari. Let's find a time that suits you.</p></div>
 
-    <div class="tool-grid bk-grid" id="bk" data-topics={JSON.stringify(topics)} data-modes={JSON.stringify(BOOKING.modes)}>
+    <div class="tool-grid bk-grid" id="bk" data-topics={JSON.stringify(topics)} data-modes={JSON.stringify(getBookingModes())}>
       <div class="tool-card bk-main">
-        <noscript><p class="tool-note">Booking needs JavaScript. Please <a class="link" href="/contact">use the contact page</a> or call 040-66462292.</p></noscript>
+        <noscript><p class="tool-note">Booking needs JavaScript. Please <a class="link" href="/contact">use the contact page</a> {main.tel && <>or call {main.tel}.</>}</p></noscript>
         <p class="bk-step"><b>1</b> What would you like to discuss?</p>
         <div class="seg" id="bk-topics"></div>
 
@@ -44,7 +47,7 @@ const topics = enquiryTypes.map((t) => t.title);
       <aside class="tool-card tool-out bk-side" aria-live="polite">
         <div id="bk-summary"></div>
         <div class="bk-done" id="bk-done" hidden></div>
-        <p class="tool-note" style="margin-top:1.4rem">Need help right now? Call <a class="link" href="tel:+914066462292">040-66462292</a> (Hyderabad) or <a class="link" href="tel:+918662975292">0866-2975292</a> (Vijayawada).</p>
+        {callable.length > 0 && <p class="tool-note" style="margin-top:1.4rem">Need help right now? Call {callable.map((o, i) => <><a class="link" href={`tel:${telHrefOf(o.phones[0])}`}>{o.phones[0]}</a> ({o.city}){i < callable.length - 1 ? ' or ' : ''}</>)}.</p>}
       </aside>
     </div>
   </section>
@@ -140,10 +143,10 @@ const topics = enquiryTypes.map((t) => t.title);
           <a class="btn ghost" target="_blank" rel="noopener" href="${gcal}">Add to my Google Calendar</a>`;
         form.reset(); msg.textContent = '';
       } else {
-        msg.textContent = res.status === 409 ? data.error : res.status === 503 || data.error === 'send-failed' ? 'Sorry, we could not send your request just now. Please call 040-66462292.' : data.error || 'Something went wrong. Please call 040-66462292.';
+        msg.textContent = res.status === 409 ? data.error : res.status === 503 || data.error === 'send-failed' ? 'Sorry, we could not send your request just now. Please call ' + (document.body.dataset.phone || 'us') + '.' : data.error || 'Something went wrong. Please call ' + (document.body.dataset.phone || 'us') + '.';
         if (res.status === 409) { times(); }
       }
-    } catch { msg.textContent = 'Network problem. Please try again or call 040-66462292.'; }
+    } catch { msg.textContent = 'Network problem. Please try again or call ' + (document.body.dataset.phone || 'us') + '.'; }
     ($('bk-submit') as HTMLButtonElement).disabled = false;
   });
 </script>

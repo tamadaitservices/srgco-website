@@ -2,12 +2,21 @@
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
 import Mascot from '../components/Mascot.astro';
-import { firm, services, values, promises, timeline, sectors, offices, enquiryTypes } from '../data/site';
+import { firm, values, promises, timeline, sectors } from '../data/site';
+import { getOffices, getServices, getEnquiryTypes, mapLinks, mainPhone, telHref as telHrefOf } from '../lib/content';
+
+const services = getServices();
+const offices = getOffices();
+const enquiryTypes = getEnquiryTypes();
+const main = mainPhone();
+const cityList = offices.filter((o) => o.primary).map((o) => o.city);
+const others = offices.filter((o) => !o.primary).map((o) => o.city);
+const listOf = (a: string[]) => (a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0] || '');
 
 const years = new Date().getFullYear() - firm.established;
 const faq = [
-  { q: 'Where are S.R. Garimella & Co. offices located?', a: 'We have offices in Hyderabad (Himayat Nagar) and Vijayawada (Veterinary Colony), and also serve clients in Rajahmundry and Kakinada.' },
-  { q: 'What services do you provide?', a: 'Audit & assurance, direct tax advisory and litigation support, international taxation and transfer pricing, GST and customs, 100% EOU compliance, corporate law, corporate finance advisory, and accounting outsourcing.' },
+  { q: 'Where are S.R. Garimella & Co. offices located?', a: `We have offices in ${listOf(cityList)}${others.length ? `, and also serve clients in ${listOf(others)}` : ''}.` },
+  { q: 'What services do you provide?', a: listOf(services.map((x) => x.title)) + '.' },
   { q: 'Since when has the firm been practising?', a: 'The firm was established in 1989 by Late Sri Garimella Someswara Rao, FCA, and was reconstituted as a partnership firm in 2009.' },
 ];
 const faqLd = {
@@ -154,9 +163,9 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
               <li>{years}+ years of practice</li>
               <li>Tax · Assurance · Advisory</li>
             </ul>
-            <a class="cl-call" href="tel:+914066462292" data-in style="--d:.5s">
+            <a class="cl-call" href={`tel:${main.href}`} data-in style="--d:.5s">
               <span class="cl-call-ico"><Icon name="phone" size={20} /></span>
-              <span><small>Prefer to talk? Call us</small><strong>040-66462292</strong></span>
+              <span><small>Prefer to talk? Call us</small><strong>{main.tel}</strong></span>
             </a>
           </div>
 
@@ -312,7 +321,7 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
         <div class="cl-head">
           <p class="cl-eyebrow">Offices</p>
           <h2>Visit or call us.</h2>
-          <p>Also serving clients in Rajahmundry and Kakinada.</p>
+          {others.length > 0 && <p>Also serving clients in {listOf(others)}.</p>}
         </div>
         <div class="cl-offices">
           {offices.filter((o) => o.primary).map((o) => (
@@ -324,8 +333,9 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
                 <span class="block">{o.city} – {o.postal}</span>
               </address>
               <div class="cl-office-links">
-                <a href={`tel:${o.telHref}`}><Icon name="phone" size={18} /> {o.tel}</a>
-                <a class="cl-mail-btn" href={`mailto:${o.email}`}><Icon name="mail" size={18} /> Email us</a>
+                {o.phones.map((p) => <a href={`tel:${telHrefOf(p)}`}><Icon name="phone" size={18} /> {p}</a>)}
+                {o.email && <a class="cl-mail-btn" href={`mailto:${o.email}`}><Icon name="mail" size={18} /> Email us</a>}
+                <a class="cl-mail-btn" href={mapLinks(o).open} target="_blank" rel="noopener noreferrer"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6-7-11a7 7 0 0114 0c0 5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg> View on map</a>
               </div>
             </div>
           ))}
@@ -404,11 +414,11 @@ const roman = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii'];
           } else {
             if (owl) { mood(owl, 'worried'); say(bub, 'Oops, that did not go through.'); }
             msg.className = 'cl-enq-msg err';
-            msg.textContent = 'Sorry, we could not send that just now. Please call 040-66462292 or use the contact page.';
+            msg.textContent = 'Sorry, we could not send that just now. Please call ' + (document.body.dataset.phone || 'us') + ' or use the contact page.';
           }
         } catch {
           msg.className = 'cl-enq-msg err';
-          msg.textContent = 'Network problem. Please try again or call 040-66462292.';
+          msg.textContent = 'Network problem. Please try again or call ' + (document.body.dataset.phone || 'us') + '.';
         }
         btn.disabled = false;
       });

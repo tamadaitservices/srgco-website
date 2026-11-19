@@ -2,7 +2,8 @@
 // Banner for a note: the uploaded image if there is one, otherwise a generated
 // banner coloured by category with the related service's icon.
 import Icon from './Icon.astro';
-import { services } from '../data/site';
+import { getServices } from '../lib/content';
+const services = getServices();
 interface Props { title: string; category: string; service?: string; image?: string; size?: 'card' | 'hero' }
 const { title, category, service, image, size = 'card' } = Astro.props;
 const icon = services.find((s) => s.slug === service)?.icon ?? 'receipt';
