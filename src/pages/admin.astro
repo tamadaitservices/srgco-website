@@ -72,59 +72,86 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
   )}
 
   {enabled && authed && (
-    <div id="app">
-      <header class="ad-top">
-        <div class="ad-strip"></div>
-        <div class="ad-top-in">
-          <div class="ad-brand">
-            <span class="ad-badge" aria-hidden="true"><svg viewBox="-30 -30 60 60"><circle r="26" fill="#fff" stroke="#000080" stroke-width="3" /><circle r="4" fill="#000080" />{chakra.map((a) => <line y1="-5" y2="-24" stroke="#000080" stroke-width="1.4" transform={`rotate(${a})`} />)}</svg></span>
-            <div><b>S.R. Garimella &amp; Co.,</b><small>Admin Console</small></div>
-          </div>
-          <div class="ad-user">
-            <span title={email}>{email}</span>
-            <a class="ad-btn ghost sm" href="/" target="_blank" rel="noopener">View site</a>
-            <button class="ad-btn ghost sm" type="button" id="logout">Sign out</button>
-          </div>
+    <div id="app" class="ad-app">
+      <aside class="ad-side">
+        <div class="ad-brand">
+          <span class="ad-badge" aria-hidden="true"><svg viewBox="-30 -30 60 60"><circle r="26" fill="#fff" stroke="#000080" stroke-width="3" /><circle r="4" fill="#000080" />{chakra.map((a) => <line y1="-5" y2="-24" stroke="#000080" stroke-width="1.4" transform={`rotate(${a})`} />)}</svg></span>
+          <div><b>S.R. Garimella &amp; Co.,</b><small>Admin Console</small></div>
         </div>
-      </header>
-
-      <div class="ad-shell">
+        <p class="ad-nav-lab">Menu</p>
         <nav class="ad-nav" role="tablist" aria-label="Admin sections">
-          <button role="tab" aria-selected="true" data-tab="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12l4 4v12H4z" /><path d="M8 12h8M8 16h5" /></svg>About page</button>
-          <button role="tab" aria-selected="false" data-tab="look"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 3v18M3 12h9" /></svg>Appearance</button>
-          <button role="tab" aria-selected="false" data-tab="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg>Security</button>
+          <button role="tab" aria-selected="true" data-tab="home"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z" /></svg></span>Overview</button>
+          <button role="tab" aria-selected="false" data-tab="about"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5" /></svg></span>About page</button>
+          <button role="tab" aria-selected="false" data-tab="look"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 100 18c1.5 0 2-1 1.5-2s0-2 1.5-2h2A4 4 0 0021 10c0-4-4-7-9-7zM7.5 11h.01M10 7.5h.01M14 7.5h.01" /></svg></span>Appearance</button>
+          <button role="tab" aria-selected="false" data-tab="security"><span class="ni"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" /><path d="M9 12l2 2 4-4" /></svg></span>Security</button>
         </nav>
+        <div class="ad-side-foot">
+          <div class="ad-me"><span class="ad-av" aria-hidden="true">{email.charAt(0) || 'A'}</span><div><b>Administrator</b><span title={email}>{email}</span></div></div>
+          <a class="ad-btn ghost sm" href="/" target="_blank" rel="noopener">View website ↗</a>
+          <button class="ad-btn ghost sm" type="button" id="logout">Sign out</button>
+        </div>
+      </aside>
 
-        <main>
-          <section class="ad-view" data-panel="about">
-            <h1 class="ad-h">About page</h1>
-            <p class="ad-sub">Edit what visitors see on the About page. Changes go live when you press Save.</p>
-            <div id="about-fields"><p class="ad-sub">Loading…</p></div>
+      <div class="ad-main">
+        <div class="ad-mhead"><span class="ad-badge" aria-hidden="true"><svg viewBox="-30 -30 60 60"><circle r="26" fill="#fff" stroke="#000080" stroke-width="3" /><circle r="4" fill="#000080" />{chakra.map((a) => <line y1="-5" y2="-24" stroke="#000080" stroke-width="1.4" transform={`rotate(${a})`} />)}</svg></span><b>S.R. Garimella &amp; Co.,</b><button class="ad-btn ghost sm" type="button" id="logout-m" style="margin-left:auto">Sign out</button></div>
+        <header class="ad-head">
+          <div><p class="ad-crumb">Admin / <b id="crumb">Overview</b></p><h1 class="ad-title" id="title">Overview</h1></div>
+        </header>
+
+        <main class="ad-content">
+          <section class="ad-view" data-panel="home">
+            <div class="ad-banner">
+              <div><h2 id="greet">Welcome back</h2><p>Everything for your website in one place. Update the About page, choose which themes visitors can use, and keep your account secure.</p></div>
+              <AdminFlag />
+            </div>
+            <div class="ad-stats" id="stats"></div>
+            <h2 class="ad-h2">Quick actions</h2>
+            <div class="ad-quick">
+              <button type="button" class="ad-q" data-goto="about"><b>Edit About page <i>→</i></b><span>Founders, photos, timeline, values and promise.</span></button>
+              <button type="button" class="ad-q" data-goto="look"><b>Manage themes <i>→</i></b><span>Turn themes on or off and pick the default.</span></button>
+              <button type="button" class="ad-q" data-goto="security"><b>Change password <i>→</i></b><span>Keep your admin account safe.</span></button>
+            </div>
+            <h2 class="ad-h2">System health</h2>
+            <div class="ad-health" id="health"><div class="ad-hrow"><span class="ad-dot"></span><div><b>Checking…</b></div></div></div>
+          </section>
+
+          <section class="ad-view" data-panel="about" hidden>
+            <p class="ad-lead">Edit what visitors see on the About page. Changes go live when you press Save.</p>
+            <div id="about-fields"><p class="ad-lead">Loading…</p></div>
           </section>
 
           <section class="ad-view" data-panel="look" hidden>
-            <h1 class="ad-h">Appearance</h1>
-            <p class="ad-sub">Choose which colour themes visitors can pick from, and which one new visitors see first. Turn a theme off to remove it from the website's theme switcher.</p>
+            <p class="ad-lead">Choose which colour themes visitors can pick from, and which one new visitors see first. A theme that is switched off is removed from the website's theme switcher.</p>
             <div id="theme-fields" class="ad-themes"></div>
           </section>
 
           <section class="ad-view" data-panel="security" hidden>
-            <h1 class="ad-h">Security</h1>
-            <p class="ad-sub">Signed in as <b>{email}</b>.</p>
-            <form class="ad-sec" id="f-pw" novalidate>
-              <h3>Change password</h3>
-              <label class="ad-field"><span>Current password</span><input class="ad-in" type="password" name="current" autocomplete="current-password" /></label>
-              <label class="ad-field"><span>New password</span><span class="ad-pw"><input class="ad-in" type="password" name="next" autocomplete="new-password" /><button type="button" class="ad-eye" data-eye>Show</button></span><span class="ad-meter"><i id="meter"></i></span></label>
-              <label class="ad-field"><span>Confirm new password</span><input class="ad-in" type="password" name="again" autocomplete="new-password" /></label>
-              <button class="ad-btn" type="submit" style="margin-top:1.2rem">Update password</button>
-              <p class="ad-msg" role="status" id="pw-msg"></p>
-            </form>
-            <div class="ad-sec"><h3>Forgot it later?</h3><p class="ad-sub">On the sign-in page choose “Forgot password?”. A reset link is emailed to {email} (needs the website's email settings to be configured).</p></div>
+            <p class="ad-lead">Signed in as <b>{email}</b>.</p>
+            <div class="ad-secgrid">
+              <form class="ad-sec" id="f-pw" novalidate>
+                <h3><span class="ad-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2" /><path d="M8 11V8a4 4 0 018 0v3" /></svg></span>Change password</h3>
+                <label class="ad-field"><span>Current password</span><input class="ad-in" type="password" name="current" autocomplete="current-password" /></label>
+                <label class="ad-field"><span>New password</span><span class="ad-pw"><input class="ad-in" type="password" name="next" autocomplete="new-password" /><button type="button" class="ad-eye" data-eye>Show</button></span><span class="ad-meter"><i id="meter"></i></span><span class="ad-meter-l" id="meter-l">Use at least 8 characters</span></label>
+                <label class="ad-field"><span>Confirm new password</span><input class="ad-in" type="password" name="again" autocomplete="new-password" /></label>
+                <button class="ad-btn" type="submit" style="margin-top:1.3rem">Update password</button>
+                <p class="ad-msg" role="status" id="pw-msg"></p>
+              </form>
+              <div class="ad-sec">
+                <h3><span class="ad-ico g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" /><path d="M9 12l2 2 4-4" /></svg></span>Good to know</h3>
+                <ul class="ad-tips">
+                  <li>Use a long password you do not use anywhere else.</li>
+                  <li>Forgot it? On the sign-in page choose “Forgot password?” and a reset link is emailed to {email}.</li>
+                  <li>Your password is stored as a salted hash, never as plain text.</li>
+                  <li>Changing it signs out all other devices.</li>
+                </ul>
+              </div>
+            </div>
           </section>
         </main>
       </div>
 
-      <div class="ad-bar" id="bar"><div class="ad-bar-in"><button class="ad-btn" type="button" id="save">Save changes</button><span class="ad-toast" id="toast" role="status"></span></div></div>
+      <div class="ad-save hide" id="bar"><span id="save-state">All changes saved</span><button class="ad-btn" type="button" id="save">Save changes</button></div>
+      <div class="ad-toasts" id="toasts" aria-live="polite"></div>
     </div>
   )}
 </AdminLayout>
@@ -187,63 +214,92 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
   // =============== signed-in dashboard ===============
   const app = $('#app');
   if (app) {
-    const toast = $('#toast')!;
-    const note = (t: string, kind = '') => { toast.textContent = t; toast.className = 'ad-toast ' + kind; };
-    $('#logout')!.addEventListener('click', async () => { await post('/api/admin/logout', {}); location.href = '/admin'; });
+    const ic = (d: string) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${d}"/></svg>`;
+    const I = {
+      user: 'M16 20v-1a4 4 0 00-4-4H8a4 4 0 00-4 4v1M10 11a3 3 0 100-6 3 3 0 000 6M20 20v-1a3 3 0 00-2-2.8M16 5.2a3 3 0 010 5.6',
+      img: 'M4 5h16v14H4zM4 15l4-4 4 4 3-3 5 5M9 9h.01', clock: 'M12 3a9 9 0 100 18 9 9 0 000-18zM12 7v5l3 2', doc: 'M6 3h9l4 4v14H6zM14 3v5h5M9 13h7M9 17h5',
+      heart: 'M12 21s-7-4.5-9.3-9A5 5 0 0112 6a5 5 0 019.3 6C19 16.5 12 21 12 21z', pal: 'M12 3a9 9 0 100 18c1.5 0 2-1 1.5-2s0-2 1.5-2h2A4 4 0 0021 10c0-4-4-7-9-7zM7.5 11h.01M10 7.5h.01M14 7.5h.01',
+      plus: 'M12 5v14M5 12h14', trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3', eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 100 6 3 3 0 000-6',
+    };
+    const toasts = $('#toasts')!;
+    const note = (t: string, kind = '', ms = 3600) => {
+      if (!t) return;
+      const el = document.createElement('div'); el.className = 'ad-t ' + kind; el.textContent = t; toasts.appendChild(el);
+      while (toasts.children.length > 3) toasts.firstElementChild!.remove();
+      setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, ms);
+    };
+    const signOut = async () => { await post('/api/admin/logout', {}); location.href = '/admin'; };
+    $('#logout')!.addEventListener('click', signOut); $('#logout-m')?.addEventListener('click', signOut);
+
+    // ---- unsaved-changes tracking ----
+    let dirty = false;
+    const bar = $('#bar')!, barState = $('#save-state')!;
+    const setDirty = (v: boolean) => { dirty = v; bar.classList.toggle('dirty', v); barState.textContent = v ? 'You have unsaved changes' : 'All changes saved'; };
+    addEventListener('beforeunload', (e) => { if (dirty) e.preventDefault(); });
 
     // ---- tabs ----
-    let tab = 'about';
+    const TITLES: Record<string, string> = { home: 'Overview', about: 'About page', look: 'Appearance', security: 'Security' };
+    let tab = 'home';
     const tabs = Array.from(app.querySelectorAll<HTMLButtonElement>('[data-tab]'));
     const panels = Array.from(app.querySelectorAll<HTMLElement>('[data-panel]'));
     const go = (t: string) => {
-      tab = t; note('');
+      tab = t;
       tabs.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
       panels.forEach((p) => { const on = p.dataset.panel === t; p.hidden = !on; if (on) { p.style.animation = 'none'; void p.offsetWidth; p.style.animation = ''; } });
-      $('#bar')!.style.display = t === 'security' ? 'none' : '';
+      $('#title')!.textContent = TITLES[t]; $('#crumb')!.textContent = TITLES[t];
+      bar.classList.toggle('hide', !(t === 'about' || t === 'look'));
       history.replaceState(null, '', '#' + t);
+      scrollTo({ top: 0 });
+      if (t === 'home') renderHome();
     };
     tabs.forEach((b) => b.addEventListener('click', () => go(b.dataset.tab!)));
-    go(['about', 'look', 'security'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'about');
+    app.addEventListener('click', (e) => { const g = (e.target as HTMLElement).closest<HTMLElement>('[data-goto]'); if (g) go(g.dataset.goto!); });
 
     // ---- About editor ----
     type Founder = { name: string; role: string; bio: string; photo: string };
     type About = { description: string; approach: string; founders: Founder[]; photos: { src: string; caption: string }[]; timeline: { year: string; text: string }[]; values: string[]; promises: string[] };
-    let about: About;
+    let about: About = { description: '', approach: '', founders: [], photos: [], timeline: [], values: [], promises: [] };
     const box = $('#about-fields')!;
-    const photoField = (i: number, url: string) => `
-      <div class="ad-photo" data-i="${i}">
-        ${url ? `<img src="${esc(url)}" alt="" />` : '<span class="ad-noimg">No photo</span>'}
-        <label class="ad-btn ghost sm">Upload photo<input type="file" accept="image/jpeg,image/png,image/webp" hidden /></label>
-        ${url ? '<button type="button" class="ad-linkbtn" data-act="rm-photo">Remove</button>' : ''}
-      </div>`;
+    const initials = (n: string) => n.replace(/^(Late|Sri|Mr|Ms|Dr)\.?\s+/i, '').split(/[\s.]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
+    const head = (icon: string, cls: string, title: string, hint = '') => `<h3><span class="ad-ico ${cls}">${ic(icon)}</span>${title}</h3>${hint ? `<p class="ad-hint">${hint}</p>` : ''}`;
     function renderAbout() {
       box.innerHTML = `
-        <div class="ad-sec"><h3>Introduction</h3>
+        <div class="ad-sec">${head(I.doc, '', 'Introduction', 'The first paragraphs on the About page.')}
           <label class="ad-field"><span>About the firm</span><textarea class="ad-in" rows="4" data-k="description">${esc(about.description)}</textarea></label>
           <label class="ad-field"><span>Our approach</span><textarea class="ad-in" rows="3" data-k="approach">${esc(about.approach)}</textarea></label>
         </div>
-        <div class="ad-sec"><h3>Founders &amp; partners</h3>
+        <div class="ad-sec">${head(I.user, 'o', 'Founders &amp; partners', 'Add a photo and a short description for each person.')}
           ${about.founders.map((f, i) => `
-            <div class="ad-item" data-list="founders" data-i="${i}">
-              <label class="ad-field" style="margin-top:0"><span>Name</span><input class="ad-in" data-f="name" value="${esc(f.name)}" /></label>
-              <label class="ad-field"><span>Role / qualifications</span><input class="ad-in" data-f="role" value="${esc(f.role)}" /></label>
-              <label class="ad-field"><span>Details</span><textarea class="ad-in" rows="3" data-f="bio">${esc(f.bio)}</textarea></label>
-              ${photoField(i, f.photo)}
-              <button type="button" class="ad-btn danger sm" data-act="del">Remove this person</button>
+            <div class="ad-founder" data-list="founders" data-i="${i}">
+              <div class="ad-fp ad-photo" data-i="${i}">
+                ${f.photo ? `<img src="${esc(f.photo)}" alt="" />` : `<span class="ph">${esc(initials(f.name))}</span>`}
+                <div><label class="ad-btn ghost sm">${f.photo ? 'Change photo' : 'Upload photo'}<input type="file" accept="image/jpeg,image/png,image/webp" hidden /></label>
+                ${f.photo ? '<br /><button type="button" class="ad-linkbtn" data-act="rm-photo" style="font-size:.8rem">Remove photo</button>' : ''}</div>
+              </div>
+              <div class="ad-fd">
+                <label class="ad-field"><span>Name</span><input class="ad-in" data-f="name" value="${esc(f.name)}" /></label>
+                <label class="ad-field"><span>Role / qualifications</span><input class="ad-in" data-f="role" value="${esc(f.role)}" /></label>
+                <label class="ad-field"><span>Details</span><textarea class="ad-in" rows="3" data-f="bio">${esc(f.bio)}</textarea></label>
+              </div>
+              <button type="button" class="ad-btn danger sm ad-rm" data-act="del">Remove</button>
             </div>`).join('')}
-          <button type="button" class="ad-btn ghost sm" style="margin-top:1rem" data-act="add-founder">+ Add a person</button>
+          <button type="button" class="ad-add" data-act="add-founder">+ Add a person</button>
         </div>
-        <div class="ad-sec"><h3>Gallery photos</h3>
-          <div class="ad-gal">${about.photos.map((p, i) => `<div data-list="photos" data-i="${i}"><img src="${esc(p.src)}" alt="" /><input class="ad-in" data-f="caption" placeholder="Caption (optional)" value="${esc(p.caption)}" /><button type="button" class="ad-linkbtn" data-act="del">Remove</button></div>`).join('')}</div>
-          <label class="ad-btn ghost sm">+ Add photos<input type="file" id="gal-up" accept="image/jpeg,image/png,image/webp" multiple hidden /></label>
+        <div class="ad-sec">${head(I.img, 'p', 'Gallery', 'JPG, PNG or WebP, up to 4 MB each.')}
+          <div class="ad-gal">
+            ${about.photos.map((p, i) => `<div class="ad-tile" data-list="photos" data-i="${i}"><img src="${esc(p.src)}" alt="" /><button type="button" data-act="del" aria-label="Remove photo">✕</button><input class="ad-in" data-f="caption" placeholder="Caption (optional)" value="${esc(p.caption)}" /></div>`).join('')}
+            <label class="ad-up">${ic(I.plus)}<span>Add photos</span><small>Select one or many</small><input type="file" id="gal-up" accept="image/jpeg,image/png,image/webp" multiple hidden /></label>
+          </div>
         </div>
-        <div class="ad-sec"><h3>Our legacy (timeline)</h3>
-          <div class="ad-list">${about.timeline.map((t, i) => `<div class="ad-trow" data-list="timeline" data-i="${i}"><input class="ad-in" data-f="year" value="${esc(t.year)}" placeholder="Year" /><input class="ad-in" data-f="text" value="${esc(t.text)}" placeholder="What happened" /><button type="button" class="ad-linkbtn" data-act="del" aria-label="Remove row">✕</button></div>`).join('')}</div>
-          <button type="button" class="ad-btn ghost sm" style="margin-top:1rem" data-act="add-row">+ Add a row</button>
+        <div class="ad-sec">${head(I.clock, 'g', 'Our legacy', 'The timeline shown on the About page.')}
+          <div class="ad-tl">${about.timeline.map((t, i) => `<div class="ad-trow" data-list="timeline" data-i="${i}"><input class="ad-in" data-f="year" value="${esc(t.year)}" placeholder="Year" /><input class="ad-in" data-f="text" value="${esc(t.text)}" placeholder="What happened" /><button type="button" class="ad-x" data-act="del" aria-label="Remove row">✕</button></div>`).join('')}</div>
+          <button type="button" class="ad-add" data-act="add-row">+ Add a row</button>
         </div>
-        <div class="ad-sec"><h3>Core values &amp; promise</h3>
-          <label class="ad-field"><span>Core values (one per line)</span><textarea class="ad-in" rows="6" data-k="values">${esc(about.values.join('\n'))}</textarea></label>
-          <label class="ad-field"><span>Our promise (one per line)</span><textarea class="ad-in" rows="5" data-k="promises">${esc(about.promises.join('\n'))}</textarea></label>
+        <div class="ad-sec">${head(I.heart, '', 'Core values &amp; promise', 'One item per line.')}
+          <div class="ad-two">
+            <label class="ad-field"><span>Core values</span><textarea class="ad-in" rows="7" data-k="values">${esc(about.values.join('\n'))}</textarea></label>
+            <label class="ad-field"><span>Our promise</span><textarea class="ad-in" rows="7" data-k="promises">${esc(about.promises.join('\n'))}</textarea></label>
+          </div>
         </div>`;
     }
     function collect() {
@@ -263,6 +319,7 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       if (!r.ok) throw new Error(j.error || 'Upload failed.');
       return j.url;
     }
+    box.addEventListener('input', () => setDirty(true));
     box.addEventListener('click', (e) => {
       const t = (e.target as HTMLElement).closest<HTMLElement>('[data-act]'); if (!t) return;
       collect();
@@ -272,16 +329,16 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       else if (a === 'add-founder') about.founders.push({ name: '', role: '', bio: '', photo: '' });
       else if (a === 'add-row') about.timeline.push({ year: '', text: '' });
       else if (a === 'rm-photo') about.founders[Number(t.closest<HTMLElement>('.ad-photo')!.dataset.i)].photo = '';
-      renderAbout();
+      setDirty(true); renderAbout();
     });
     box.addEventListener('change', async (e) => {
       const input = e.target as HTMLInputElement;
       if (input.type !== 'file' || !input.files?.length) return;
-      collect(); note('Uploading…');
+      collect(); note('Uploading…', '', 1800);
       try {
         if (input.id === 'gal-up') for (const f of Array.from(input.files)) about.photos.push({ src: await upload(f), caption: '' });
         else about.founders[Number(input.closest<HTMLElement>('.ad-photo')!.dataset.i)].photo = await upload(input.files[0]);
-        note('Photo uploaded. Press Save to publish.', 'ok'); renderAbout();
+        setDirty(true); note('Photo uploaded. Press Save to publish.', 'ok'); renderAbout();
       } catch (err) { note((err as Error).message, 'err'); }
     });
 
@@ -296,16 +353,17 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
     let cfg = { enabled: THEMES.map((t) => t.id), defaultTheme: 'navy' };
     const tbox = $('#theme-fields')!;
     function renderThemes() {
-      tbox.innerHTML = THEMES.map((t) => {
+      tbox.innerHTML = THEMES.map((t, n) => {
         const on = cfg.enabled.includes(t.id), def = cfg.defaultTheme === t.id;
-        return `<div class="ad-theme ${on ? '' : 'off'} ${def ? 'def' : ''}" data-id="${t.id}">
-          <div class="ad-prev" style="background:${t.bg}"><i style="background:${t.fg}"></i><i style="background:${t.fg}"></i><i style="background:${t.ac}"></i></div>
+        return `<div class="ad-theme ${on ? '' : 'off'} ${def ? 'def' : ''}" data-id="${t.id}" style="animation-delay:${n * 60}ms">
+          <div class="ad-prev" style="background:${t.bg}"><div class="ad-pnav"><i style="background:${t.fg}"></i><i style="background:${t.fg}"></i><i style="background:${t.fg}"></i><u style="background:${t.ac}"></u></div>
+            <div class="ad-phero"><em style="background:${t.fg}"></em><em style="background:${t.fg}"></em><em style="background:${t.ac}"></em></div></div>
           <div class="ad-theme-b">
             <div class="ad-theme-t"><span>${t.name}</span>${def ? '<span class="ad-tag">Default</span>' : ''}</div>
             <p class="ad-sub" style="margin:0">${t.note}</p>
             <div class="ad-theme-a">
               <label class="ad-sw" title="${on ? 'Enabled' : 'Disabled'}"><input type="checkbox" data-en ${on ? 'checked' : ''} aria-label="Enable ${t.name}" /><span></span></label>
-              <button type="button" class="ad-btn ghost sm" data-def ${def || !on ? 'disabled' : ''}>${def ? 'Default' : 'Make default'}</button>
+              <button type="button" class="ad-btn ghost sm" data-def ${def || !on ? 'disabled' : ''}>${def ? '✓ Default' : 'Make default'}</button>
             </div></div></div>`;
       }).join('');
     }
@@ -315,17 +373,48 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       if (!el.checked && cfg.enabled.length === 1) { el.checked = true; return note('At least one theme must stay enabled.', 'err'); }
       cfg.enabled = el.checked ? THEMES.map((t) => t.id).filter((x) => x === id || cfg.enabled.includes(x)) : cfg.enabled.filter((x) => x !== id);
       if (!cfg.enabled.includes(cfg.defaultTheme)) cfg.defaultTheme = cfg.enabled[0];
-      note(''); renderThemes();
+      setDirty(true); renderThemes();
     });
     tbox.addEventListener('click', (e) => {
       const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-def]'); if (!b || b.disabled) return;
-      cfg.defaultTheme = b.closest<HTMLElement>('.ad-theme')!.dataset.id!; note(''); renderThemes();
+      cfg.defaultTheme = b.closest<HTMLElement>('.ad-theme')!.dataset.id!; setDirty(true); renderThemes();
     });
 
+    // ---- Overview ----
+    let health: { mail: boolean; storage: boolean; customStorage: boolean } | null = null;
+    const h = new Date().getHours();
+    $('#greet')!.textContent = (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ' 👋';
+    function countUp(el: HTMLElement, to: number) {
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || to === 0) { el.textContent = String(to); return; }
+      const t0 = performance.now();
+      const step = (t: number) => { const p = Math.min(1, (t - t0) / 700); el.textContent = String(Math.round(to * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    }
+    function renderHome() {
+      const defName = THEMES.find((t) => t.id === cfg.defaultTheme)?.name ?? '';
+      const cards = [
+        { c: 'c1', i: I.pal, n: cfg.enabled.length, sfx: ` / ${THEMES.length}`, l: 'Themes switched on' },
+        { c: 'c2', i: I.eye, text: defName, l: 'Default theme' },
+        { c: 'c3', i: I.user, n: about.founders.length, l: 'Founders & partners' },
+        { c: 'c4', i: I.img, n: about.photos.length, l: 'Gallery photos' },
+      ];
+      $('#stats')!.innerHTML = cards.map((c, k) => `<div class="ad-stat ${c.c}" style="animation-delay:${k * 70}ms"><span class="si">${ic(c.i)}</span><b>${c.text ? esc(c.text) : `<em data-n="${c.n}" style="font-style:normal">0</em>${c.sfx ?? ''}`}</b><span>${c.l}</span></div>`).join('');
+      $('#stats')!.querySelectorAll<HTMLElement>('[data-n]').forEach((el) => countUp(el, Number(el.dataset.n)));
+      const row = (ok: boolean, t: string, d: string, pill: string) => `<div class="ad-hrow"><span class="ad-dot ${ok ? 'ok' : 'warn'}"></span><div><b>${t}</b><small>${d}</small></div><span class="ad-pill ${ok ? '' : 'warn'}">${pill}</span></div>`;
+      $('#health')!.innerHTML = !health ? '<div class="ad-hrow"><span class="ad-dot"></span><div><b>Checking…</b></div></div>' :
+        row(health.mail, 'Email delivery', health.mail ? 'Enquiries and password-reset emails can be sent.' : 'Email is not set up yet. Enquiries cannot be emailed and “Forgot password” will not work.', health.mail ? 'Ready' : 'Needs setup') +
+        row(health.storage, 'Saved content', health.storage ? 'Your edits and photos can be saved.' : 'The server cannot write to its storage folder.', health.storage ? 'Ready' : 'Problem') +
+        row(health.customStorage, 'Safe storage location', health.customStorage ? 'Content is kept outside the app folder, so updates will not erase it.' : 'Set DATA_DIR on the server so website updates never erase your edits and photos.', health.customStorage ? 'Safe' : 'Recommended');
+    }
+
     // ---- Security ----
-    const pwForm = $<HTMLFormElement>('#f-pw')!, pwMsg = $('#pw-msg')!, meter = $('#meter')!;
+    const pwForm = $<HTMLFormElement>('#f-pw')!, pwMsg = $('#pw-msg')!, meter = $('#meter')!, meterL = $('#meter-l')!;
     const strength = (p: string) => Math.min(4, (p.length >= 8 ? 1 : 0) + (p.length >= 12 ? 1 : 0) + (/[A-Z]/.test(p) && /[a-z]/.test(p) ? 1 : 0) + (/\d/.test(p) && /[^A-Za-z0-9]/.test(p) ? 1 : 0));
-    pwForm.addEventListener('input', () => { const s = strength((pwForm.elements.namedItem('next') as HTMLInputElement).value); meter.style.width = s * 25 + '%'; meter.style.background = ['#d92d20', '#d92d20', '#f79009', '#12b76a', '#138808'][s]; });
+    pwForm.addEventListener('input', () => {
+      const v = (pwForm.elements.namedItem('next') as HTMLInputElement).value, s = strength(v);
+      meter.style.width = (v ? Math.max(s, 1) * 25 : 0) + '%'; meter.style.background = ['#d92d20', '#d92d20', '#f79009', '#12b76a', '#138808'][s];
+      meterL.textContent = !v ? 'Use at least 8 characters' : ['Too weak', 'Weak', 'Fair', 'Good', 'Strong'][s];
+    });
     pwForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const g = (n: string) => (pwForm.elements.namedItem(n) as HTMLInputElement).value;
@@ -333,20 +422,27 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
       if (g('next') !== g('again')) return m('The two new passwords do not match.', 'err');
       m('Updating…');
       const r = await post('/api/admin/password', { current: g('current'), next: g('next') });
-      if (r.ok) { m('Password updated. You stay signed in on this device.', 'ok'); pwForm.reset(); meter.style.width = '0'; } else m(r.j.error || 'Could not update.', 'err');
+      if (r.ok) { m('Password updated. You stay signed in on this device.', 'ok'); note('Password updated', 'ok'); pwForm.reset(); meter.style.width = '0'; meterL.textContent = 'Use at least 8 characters'; } else m(r.j.error || 'Could not update.', 'err');
     });
 
     // ---- Save (About or Appearance) ----
     $('#save')!.addEventListener('click', async () => {
-      note('Saving…');
+      const btn = $<HTMLButtonElement>('#save')!; btn.disabled = true;
       let r;
       if (tab === 'look') r = await post('/api/admin/settings', cfg, 'PUT');
       else { collect(); r = await post('/api/admin/about', about, 'PUT'); }
-      note(r.ok ? (tab === 'look' ? 'Saved. Visitors will see the new theme options shortly.' : 'Saved. The About page is updated.') : r.j.error || 'Could not save.', r.ok ? 'ok' : 'err');
+      btn.disabled = false;
+      if (r.ok) { setDirty(false); note(tab === 'look' ? 'Saved. Visitors will see the new theme options shortly.' : 'Saved. The About page is updated.', 'ok'); }
+      else note(r.j.error || 'Could not save.', 'err');
       if (r.status === 401) setTimeout(() => (location.href = '/admin'), 1200);
     });
 
-    fetch('/api/admin/about').then((r) => r.json()).then((d) => { about = d; renderAbout(); }).catch(() => (box.textContent = 'Could not load the content.'));
-    fetch('/api/admin/settings').then((r) => r.json()).then((d) => { cfg = d; renderThemes(); }).catch(() => (tbox.textContent = 'Could not load the settings.'));
+    // ---- load data ----
+    go(['home', 'about', 'look', 'security'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home');
+    Promise.all([
+      fetch('/api/admin/about').then((r) => r.json()).then((d) => { about = d; renderAbout(); }).catch(() => (box.textContent = 'Could not load the content.')),
+      fetch('/api/admin/settings').then((r) => r.json()).then((d) => { cfg = d; renderThemes(); }).catch(() => (tbox.textContent = 'Could not load the settings.')),
+    ]).then(() => { if (tab === 'home') renderHome(); });
+    fetch('/api/admin/status').then((r) => r.json()).then((d) => { health = d; if (tab === 'home') renderHome(); }).catch(() => {});
   }
 </script>
