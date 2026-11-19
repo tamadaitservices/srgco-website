@@ -73,6 +73,7 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
 
   {enabled && authed && (
     <div id="app" class="ad-app">
+      <div class="ad-strip-top"></div>
       <aside class="ad-side">
         <div class="ad-brand">
           <span class="ad-badge" aria-hidden="true"><svg viewBox="-30 -30 60 60"><circle r="26" fill="#fff" stroke="#000080" stroke-width="3" /><circle r="4" fill="#000080" />{chakra.map((a) => <line y1="-5" y2="-24" stroke="#000080" stroke-width="1.4" transform={`rotate(${a})`} />)}</svg></span>
@@ -87,8 +88,7 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
         </nav>
         <div class="ad-side-foot">
           <div class="ad-me"><span class="ad-av" aria-hidden="true">{email.charAt(0) || 'A'}</span><div><b>Administrator</b><span title={email}>{email}</span></div></div>
-          <a class="ad-btn ghost sm" href="/" target="_blank" rel="noopener">View website ↗</a>
-          <button class="ad-btn ghost sm" type="button" id="logout">Sign out</button>
+          <div class="ad-foot-btns"><a class="ad-btn ghost sm" href="/" target="_blank" rel="noopener">View site</a><button class="ad-btn ghost sm" type="button" id="logout">Sign out</button></div>
         </div>
       </aside>
 
@@ -100,10 +100,7 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
 
         <main class="ad-content">
           <section class="ad-view" data-panel="home">
-            <div class="ad-banner">
-              <div><h2 id="greet">Welcome back</h2><p>Everything for your website in one place. Update the About page, choose which themes visitors can use, and keep your account secure.</p></div>
-              <AdminFlag />
-            </div>
+            <div class="ad-welcome"><h2 id="greet">Welcome</h2><p>Use the menu to update your website. Edit the About page, choose the colour themes visitors can use, or change your password.</p></div>
             <div class="ad-stats" id="stats"></div>
             <h2 class="ad-h2">Quick actions</h2>
             <div class="ad-quick">
@@ -389,7 +386,7 @@ const chakra = Array.from({ length: 24 }, (_, i) => i * 15);
     // ---- Overview ----
     let health: { mail: boolean; storage: boolean; customStorage: boolean } | null = null;
     const h = new Date().getHours();
-    $('#greet')!.textContent = (h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ' 👋';
+    $('#greet')!.textContent = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
     function countUp(el: HTMLElement, to: number) {
       if (matchMedia('(prefers-reduced-motion: reduce)').matches || to === 0) { el.textContent = String(to); return; }
       const t0 = performance.now();
